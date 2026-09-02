@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='TC.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Daily contract ritual — same include as every other page -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='contract.css') }}">
+
+    <style>
+        :root {
+            --bg: #0a0e17;
+            --surface: #131a2c;
+            --surface-border: #2a3349;
+            --gold: #c9a227;
+            --gold-bright: #e0c158;
+            --text: #ece7da;
+            --text-muted: #8891a8;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            padding: 0 8px;
+            box-sizing: border-box;
+        }
+
+        /* The menu button now floats over the page instead of
+           sitting in normal flow — that row of empty space above
+           the chart is what was eating your vertical room. */
+        #menuBtn {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            width: 46px;
+            height: 46px;
+            font-size: 20px;
+            z-index: 1001;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Thin strip instead of the old full-height title block —
+           just enough to say where you are. */
+        #Title {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 15px;
+            letter-spacing: 1px;
+            color: var(--gold);
+            padding: 10px 0 6px;
+        }
+
+        /* ── Sidebar (identical pattern to every other page) ───── */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: -260px;
+            width: 250px;
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--surface-border);
+            padding-top: 80px;
+            z-index: 1000;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateX(0);
+        }
+        #sidebar.open { transform: translateX(260px); }
+        #sidebar button { display: block; width: 60%; margin: 7px auto; }
+        #backdrop {
+            position: fixed; inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(6px);
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 999;
+        }
+        #backdrop.open { opacity: 1; pointer-events: all; }
+
+        button {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--gold);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 14px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: transform 0.2s ease, color 0.3s ease, box-shadow 0.5s ease;
+        }
+        button:hover {
+            transform: translateY(-5px);
+            color: var(--gold-bright);
+            box-shadow: 0 0 14px rgba(185, 163, 108, 0.35);
+        }
+
+        /* ── Chart container ──────────────────────────────────────
+           Fills nearly the whole viewport now. Everything you'd do
+           on tradingview.com itself lives in the widget's own
+           toolbar: symbol search (click the ticker name), the gear
+           icon for chart settings, drawing tools down the left
+           side, indicators, timeframe. Sign in via the widget's own
+           "Sign in" (top-right of the chart) with a free TradingView
+           account and your drawings/style edits will save to that
+           account and reload automatically next time — the widget
+           itself doesn't have a way to persist that locally without
+           an account. */
+        #chartWrap {
+            max-width: 1700px;
+            margin: 0 auto 10px;
+            background: var(--surface);
+            border: 1px solid var(--surface-border);
+            border-radius: 16px;
+            overflow: hidden;
+            height: calc(100vh - 105px);
+            min-height: 480px;
+        }
+
+
+#tv_chart_container {
+    width: 100%;
+    height: 100%;
+    
+}
+
+    </style>
+</head>
+<body>
+
+<button id="menuBtn">☰</button>
+
+<div id="backdrop"></div>
+
+<nav id="sidebar">
+    <button data-nav-key="checker" data-href="/">Trade Checker</button>
+    <button data-nav-key="journal" data-href="/calendar">Trade Journal</button>
+    <button data-nav-key="scanner" data-href="/index">Coin Scanner</button>
+    <button data-nav-key="chart" data-href="/chart">TradingView</button>
+    <button data-nav-key="contract" data-href="/contract">Daily Contract</button>
+</nav>
+
+<div id="Title">TradingView</div>
+
+
+<div id="chartWrap">
+    <div id="tv_chart_container"></div>
+</div>
+
+
+<script
+    type="text/javascript"
+    src="https://s3.tradingview.com/tv.js">
+</script>
+
+<script type="text/javascript">
+
+new TradingView.widget({
+
+    autosize: true,
+
+    symbol: "COINBASE:BTCUSD",
+
+    interval: "60",
+
+    timezone: "Etc/UTC",
+
+    theme: "dark",
+
+    style: "1",
+
+    locale: "en",
+
+    toolbar_bg: "#131a2c",
+
+    enable_publishing: false,
+
+    hide_side_toolbar: false,
+
+    allow_symbol_change: true,
+
+    details: true,
+
+    hotlist: true,
+
+    calendar: true,
+
+    withdateranges: true,
+
+    container_id: "tv_chart_container"
+
+});
+
+</script>
+
+<script>
+  
+
+    // ── Sidebar ───────────────────────────────────────────────
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('backdrop');
+
+    function openSidebar()  { sidebar.classList.add('open');    backdrop.classList.add('open'); }
+    function closeSidebar() { sidebar.classList.remove('open'); backdrop.classList.remove('open'); }
+
+    menuBtn.addEventListener('click', () => {
+        sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+    });
+    backdrop.addEventListener('click', closeSidebar);
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeSidebar();
+    });
+</script>
+
+<!-- Daily contract ritual -->
+<script src="{{ url_for('static', filename='Contract.js') }}"></script>
+<!-- Draggable, order-persisting sidebar -->
+<script src="{{ url_for('static', filename='Nav.js') }}"></script>
+
+</body>
+</html>

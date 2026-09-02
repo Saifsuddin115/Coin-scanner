@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='TC.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Daily contract ritual — this page both shows history AND
+         still enforces the ritual itself if it's due -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='contract.css') }}">
+
+    <style>
+        :root {
+            --bg: #0a0e17;
+            --surface: #131a2c;
+            --surface-border: #2a3349;
+            --gold: #c9a227;
+            --text: #ece7da;
+            --text-muted: #8891a8;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            padding: 0 8px;
+            box-sizing: border-box;
+        }
+
+        #Title {
+            max-width: 480px;
+            margin: 10px auto;
+            padding: 22px 24px;
+            border-top: 1px solid var(--surface-border);
+            border-bottom: 1px solid var(--surface-border);
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-weight: 500;
+            font-size: 25px;
+            line-height: 1.6;
+            color: var(--gold);
+        }
+
+        button {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--gold);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 14px;
+            width: 120px;
+            margin: 8px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: transform 0.2s ease, color 0.3s ease, box-shadow 0.5s ease;
+        }
+
+        button:hover {
+            transform: translateY(-5px);
+            color: var(--gold);
+            box-shadow: 0 0 14px rgba(185, 163, 108, 0.35);
+        }
+
+        #sidebar {
+            position: fixed; top: 0; left: -260px;
+            width: 250px; height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--surface-border);
+            padding-top: 80px;
+            z-index: 1000;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateX(0);
+        }
+        #sidebar.open { transform: translateX(260px); }
+        #menuBtn { width: 60px; height: 60px; font-size: 24px; z-index: 1001; }
+        #sidebar button { display: block; width: 60%; margin: 7px auto; }
+        #backdrop {
+            position: fixed; inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(6px);
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 999;
+        }
+        #backdrop.open { opacity: 1; pointer-events: all; }
+
+
+/* ================================================================
+   TC DAILY CONTRACT — STYLES
+   ----------------------------------------------------------------
+   Drop this file in /static/contract.css and link it from any page
+   that should enforce the nightly ritual. It's self-contained (own
+   :root + own font import) so it doesn't depend on the host page
+   already having Playfair Display or the color variables defined.
+
+   SECTIONS IN THIS FILE:
+     1. Fonts + color variables
+     2. The <dialog> shell (shared by every step)
+     3. Step 1 — "Did you follow yesterday's contract?" (review)
+     4. Step 2 — Punishment screen
+     5. Step 3 — Sign tonight's contract
+     6. Contract History page (Contract.html)
+   ================================================================ */
+
+/* ---------- 1. Fonts + variables -------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500&family=Dancing+Script:wght@600&display=swap');
+
+:root {
+    --bg: #0a0e17;
+    --surface: #131a2c;
+    --surface-border: #2a3349;
+    --gold: #c9a227;
+    --gold-bright: #e0c158;
+    --text: #ece7da;
+    --text-muted: #8891a8;
+    --scrim-error: rgba(8, 10, 16, 0.97);
+}
+
+/* ---------- 2. Dialog shell --------------------------------------
+   One <dialog id="tcContractDialog"> is created once by contract.js
+   and reused across all three steps — only its innerHTML changes.
+   It is opened with .showModal() and the 'cancel' event (ESC key)
+   is intercepted in JS so it can NOT be dismissed early.
+------------------------------------------------------------------- */
+#tcContractDialog {
+    background: var(--surface);
+    border: 1px solid var(--gold);
+    border-radius: 20px;
+    padding: 40px 36px;
+    max-width: 440px;
+    width: min(440px, 90vw);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 24px rgba(201, 162, 39, 0.15);
+    text-align: center;
+}
+
+#tcContractDialog[open] {
+    animation: tcFadeIn 0.3s ease;
+}
+
+#tcContractDialog::backdrop {
+    background: var(--scrim-error);
+    backdrop-filter: blur(3px);
+}
+
+@keyframes tcFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.tc-date {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--gold);
+    font-size: 14px;
+    letter-spacing: 1px;
+    margin-bottom: 18px;
+}
+
+.tc-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--text);
+    margin-bottom: 22px;
+    line-height: 1.4;
+}
+
+/* generic button reset for inside the dialog — matches TC's existing
+   button look so it never feels bolted-on. If the host page already
+   defines a global `button{}` rule, that one wins for shared
+   properties; this is just a fallback so the dialog looks right even
+   dropped onto a blank page. */
+#tcContractDialog button {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--gold);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 14px;
+    min-width: 100px;
+    margin: 6px;
+    font-family: inherit;
+    font-size: 15px;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#tcContractDialog button:hover:not(:disabled) {
+    transform: translateY(-3px);
+    color: var(--gold-bright);
+    box-shadow: 0 0 12px rgba(185, 163, 108, 0.35);
+}
+
+#tcContractDialog button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* ---------- 3. Review step ("did you follow yesterday?") --------
+   Deliberately colorless — no green check / red x. Just the two
+   glyphs in gold, same as every other button on the site.
+------------------------------------------------------------------- */
+.tc-review-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 8px;
+}
+
+.tc-review-buttons button {
+    font-size: 28px;
+    line-height: 1;
+    width: 70px;
+    height: 70px;
+}
+
+/* "Sign as [name]?" Yes/No — shown after Confirm, before saving */
+.tc-confirm-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 8px;
+}
+
+.tc-confirm-buttons button {
+    font-size: 15px;
+    width: 90px;
+}
+
+/* ---------- 4. Punishment step ----------------------------------- */
+.tc-punishment-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+    text-align: left;
+}
+
+.tc-punishment-list li {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    padding: 10px 4px;
+    border-bottom: 1px solid rgba(201, 162, 39, 0.2);
+    color: var(--text);
+}
+
+.tc-punishment-list li:last-child {
+    border-bottom: none;
+}
+
+.tc-countdown {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.tc-countdown span {
+    color: var(--gold-bright);
+    font-weight: 600;
+}
+
+/* ---------- 5. Sign step ------------------------------------------ */
+.tc-rule-text {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 20px;
+}
+
+.tc-punishment-note {
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+}
+
+.tc-punishment-note strong {
+    color: var(--gold);
+    font-weight: 500;
+}
+
+.tc-signature-label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+/* the one "cool" flourish in the whole system — a handwritten-style
+   underline input, since this is the moment of the whole ritual */
+.tc-signature-input {
+    width: 100%;
+    box-sizing: border-box;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--surface-border);
+    padding: 10px 4px 12px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 26px;
+    color: var(--gold-bright);
+    text-align: center;
+    margin-bottom: 26px;
+    transition: border-color 0.25s ease;
+}
+
+.tc-signature-input:focus {
+    outline: none;
+    border-bottom-color: var(--gold);
+}
+
+.tc-signature-input::placeholder {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+}
+
+/* ---------- 6. Contract history page ------------------------------ */
+#tcHistoryList {
+    max-width: 560px;
+    margin: 20px auto 60px;
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.tc-history-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(201, 162, 39, 0.15);
+}
+
+.tc-history-row:last-child {
+    border-bottom: none;
+}
+
+.tc-history-date {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    color: var(--text);
+}
+
+.tc-history-signed {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 3px;
+}
+
+.tc-history-status {
+    font-size: 22px;
+    color: var(--gold);
+    min-width: 30px;
+    text-align: right;
+}
+
+.tc-history-status.pending {
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.tc-history-empty {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 30px;
+}
+
+
+
+    </style>
+</head>
+<body>
+
+<button id="menuBtn">☰</button>
+
+<div id="Title">Daily Contract</div>
+
+<div id="backdrop"></div>
+
+<nav id="sidebar">
+    <button data-nav-key="checker" data-href="/">Trade Checker</button>
+    <button data-nav-key="journal" data-href="/calendar">Trade Journal</button>
+    <button data-nav-key="scanner" data-href="/index">Coin Scanner</button>
+    <button data-nav-key="chart" data-href="/chart">TradingView</button>
+    <button data-nav-key="contract" data-href="/contract">Daily Contract</button>
+</nav>
+
+<!-- contract.js looks for this exact id and fills it in automatically
+     on page load — nothing else to wire up here. -->
+<div id="tcHistoryList"></div>
+
+
+<!-- Daily contract ritual — same include as every other page.
+     Also renders #tcHistoryList above once the DOM is ready. -->
+<script src="{{ url_for('static', filename='Contract.js') }}"></script>
+<script src="{{ url_for('static', filename='Nav.js') }}"></script>
+
+</body>
+</html>
+
+<script>
+
+
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('backdrop');
+
+    function openSidebar()  { sidebar.classList.add('open');    backdrop.classList.add('open'); }
+    function closeSidebar() { sidebar.classList.remove('open'); backdrop.classList.remove('open'); }
+
+    menuBtn.addEventListener('click', () => {
+        sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+    });
+    backdrop.addEventListener('click', closeSidebar);
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeSidebar();
+    });
+
+
+/* ================================================================
+   TC DAILY CONTRACT — LOGIC
+   ----------------------------------------------------------------
+   Drop this file in /static/contract.js and include it (with
+   contract.css) on every page that should enforce the ritual.
+   It builds its own <dialog> and injects it into the page, so you
+   don't need to add any HTML for it — just the <link> and <script>
+   tags in each template's <head>.
+
+   EVERYTHING lives under the window.TCContract namespace so it
+   never collides with each page's own scripts (Calendar.html etc.
+   already use plain globals like `activeDay`).
+
+   SECTIONS IN THIS FILE:
+     1. Config — the knobs you'll actually want to tweak
+     2. "Trading day" math (the 8 PM cutoff)
+     3. localStorage read/write helpers
+     4. The dialog + its steps (review / punishment / sign / confirm)
+     5. Public API used by Contract.html to render the history list
+     6. Boot — runs the check as soon as the page loads
+   ================================================================ */
+
+(function () {
+
+    /* ---------- 1. CONFIG ---------------------------------------
+       Change these without touching any logic below.
+    ---------------------------------------------------------------*/
+
+    // Hour (24h, local time) that a new trading day begins.
+    // 20 = 8:00 PM. Before this hour, "today" is the trading day.
+    // At/after this hour, the trading day is already tomorrow's date.
+    const CONTRACT_CUTOFF_HOUR = 20;
+
+    // How long the punishment screen sits before it auto-advances
+    // to the next contract. In milliseconds.
+    const PUNISHMENT_DURATION_MS = 3 * 60 * 1000; // 3 minutes
+
+    // The line shown on every contract. Keep it short — it's meant
+    // to be read every single night, not skimmed once.
+    const RULE_TEXT = "Follow the TC today if you truly want to be profitable.";
+
+    // Shown on the sign step (the "or else") AND on the punishment
+    // step (the "this is what you owe"). Edit freely.
+    const PUNISHMENT_LIST = [
+        "100 push-ups",
+        "100 sit-ups",
+        "A cold shower",
+        "A 5-minute plank"
+    ];
+
+    // localStorage keys — everything for this system lives here.
+    const KEY_CURRENT = "tc_contract_current";
+    const KEY_HISTORY = "tc_contract_history";
+
+
+    /* ---------- 2. TRADING DAY MATH ------------------------------
+       A "trading day" is identified by a YYYY-MM-DD key + a nice
+       display label. The only thing that makes it different from a
+       normal calendar day is WHEN the key changes: at 8 PM, not
+       midnight.
+
+       NOTE: this uses local getFullYear/getMonth/getDate (not
+       toISOString) on purpose — toISOString converts to UTC first,
+       which can silently shift the date near midnight depending on
+       your timezone. This way the key always matches the date on
+       your actual clock.
+    ---------------------------------------------------------------*/
+
+    function pad(n) {
+        return n.toString().padStart(2, "0");
+    }
+
+    function dateKey(d) {
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    }
+
+    // Returns { key, label, dateObj } for the trading day that
+    // `now` currently falls in.
+    function getTradingDayInfo(now = new Date()) {
+        const d = new Date(now.getTime());
+
+        if (d.getHours() >= CONTRACT_CUTOFF_HOUR) {
+            // We've crossed the 8 PM cutoff — this belongs to
+            // tomorrow's trading day.
+            d.setDate(d.getDate() + 1);
+        }
+
+        d.setHours(0, 0, 0, 0);
+
+        const label = d.toLocaleDateString("en-US", {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+            year: "numeric"
+        });
+
+        return { key: dateKey(d), label, dateObj: d };
+    }
+
+
+    /* ---------- 3. STORAGE ----------------------------------------
+       "current" = the contract that's active right now (signed, not
+       yet reviewed). "history" = an array of past contracts, each
+       with `followed` set to true or false once reviewed.
+    ---------------------------------------------------------------*/
+
+    function loadCurrent() {
+        try {
+            const raw = localStorage.getItem(KEY_CURRENT);
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function saveCurrent(contract) {
+        if (contract === null) {
+            localStorage.removeItem(KEY_CURRENT);
+        } else {
+            localStorage.setItem(KEY_CURRENT, JSON.stringify(contract));
+        }
+    }
+
+    function loadHistory() {
+        try {
+            const raw = localStorage.getItem(KEY_HISTORY);
+            return raw ? JSON.parse(raw) : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function pushToHistory(contract) {
+        const history = loadHistory();
+        history.unshift(contract); // newest first
+        localStorage.setItem(KEY_HISTORY, JSON.stringify(history));
+    }
+
+
+    /* ---------- 4. DIALOG + STEPS ----------------------------------
+       One <dialog> element, reused for every step by swapping its
+       innerHTML. It is opened with showModal() exactly once per
+       cycle and only closed at the very end of the confirm step —
+       the 'cancel' event (ESC key) is blocked so the whole thing
+       cannot be dismissed early.
+
+       Flow: review (optional) -> punishment (optional) -> sign
+             -> confirm -> [No loops back to sign] -> [Yes closes]
+    ---------------------------------------------------------------*/
+
+    let dialogEl = null;
+
+    function ensureDialog() {
+        if (dialogEl) return dialogEl;
+
+        dialogEl = document.createElement("dialog");
+        dialogEl.id = "tcContractDialog";
+        document.body.appendChild(dialogEl);
+
+        // Block ESC-to-close — this contract isn't optional.
+        dialogEl.addEventListener("cancel", (e) => e.preventDefault());
+
+        return dialogEl;
+    }
+
+    // Step: "Did you follow yesterday's contract?"
+    function showReviewStep(prevContract, today) {
+        const dialog = ensureDialog();
+
+        dialog.innerHTML = `
+            <div class="tc-date">${prevContract.label}</div>
+            <div class="tc-title">Did you follow the TC?</div>
+            <div class="tc-review-buttons">
+                <button type="button" id="tcReviewYes" aria-label="Yes">&#10003;</button>
+                <button type="button" id="tcReviewNo" aria-label="No">&#10005;</button>
+            </div>
+        `;
+
+        if (!dialog.open) dialog.showModal();
+
+        document.getElementById("tcReviewYes").addEventListener("click", () => {
+            prevContract.followed = true;
+            pushToHistory(prevContract);
+            saveCurrent(null);
+            showSignStep(today);
+        });
+
+        document.getElementById("tcReviewNo").addEventListener("click", () => {
+            prevContract.followed = false;
+            pushToHistory(prevContract);
+            saveCurrent(null);
+            showPunishmentStep(today);
+        });
+    }
+
+    // Step: punishment screen, auto-advances after PUNISHMENT_DURATION_MS
+    function showPunishmentStep(today) {
+        const dialog = ensureDialog();
+
+        const listHtml = PUNISHMENT_LIST
+            .map((item) => `<li>${item}</li>`)
+            .join("");
+
+        dialog.innerHTML = `
+            <div class="tc-title">Pay it off.</div>
+            <ul class="tc-punishment-list">${listHtml}</ul>
+            <div class="tc-countdown">Next contract in <span id="tcCountdown"></span></div>
+        `;
+
+        if (!dialog.open) dialog.showModal();
+
+        let remainingMs = PUNISHMENT_DURATION_MS;
+        const countdownEl = document.getElementById("tcCountdown");
+
+        function renderCountdown() {
+            const totalSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
+            const m = Math.floor(totalSeconds / 60);
+            const s = totalSeconds % 60;
+            countdownEl.textContent = `${m}:${pad(s)}`;
+        }
+
+        renderCountdown();
+
+        const intervalId = setInterval(() => {
+            remainingMs -= 1000;
+            renderCountdown();
+
+            if (remainingMs <= 0) {
+                clearInterval(intervalId);
+                showSignStep(today);
+            }
+        }, 1000);
+    }
+
+    // Step: sign today's/tonight's contract.
+    // `prefillName` is only set when we bounce back here after a
+    // "No" on the confirm step, so you don't have to retype it.
+    function showSignStep(today, prefillName = "") {
+        const dialog = ensureDialog();
+
+        const punishmentItems = PUNISHMENT_LIST.join(", ");
+
+        dialog.innerHTML = `
+            <div class="tc-date">${today.label}</div>
+            <div class="tc-title">The Contract</div>
+            <div class="tc-rule-text">${RULE_TEXT}</div>
+            <div class="tc-punishment-note">
+                If you don't: <strong>${punishmentItems}</strong>.
+            </div>
+            <label class="tc-signature-label" for="tcSignatureInput">Sign to confirm</label>
+            <input
+                type="text"
+                id="tcSignatureInput"
+                class="tc-signature-input"
+                placeholder="Type your name"
+                autocomplete="off"
+                spellcheck="false"
+                autocorrect="off"
+                autocapitalize="off"
+            />
+            <button type="button" id="tcConfirmBtn" disabled>Confirm</button>
+        `;
+
+        if (!dialog.open) dialog.showModal();
+
+        const input = document.getElementById("tcSignatureInput");
+        const confirmBtn = document.getElementById("tcConfirmBtn");
+
+        if (prefillName) {
+            input.value = prefillName;
+            confirmBtn.disabled = false;
+        }
+
+        input.addEventListener("input", () => {
+            confirmBtn.disabled = input.value.trim().length === 0;
+        });
+
+        confirmBtn.addEventListener("click", () => {
+            const name = input.value.trim();
+            if (!name) return;
+            showConfirmStep(today, name);
+        });
+    }
+
+    // Step: "Sign as [name]?" Yes/No — Yes saves + closes,
+    // No goes back to the signature step with the name kept.
+    function showConfirmStep(today, name) {
+        const dialog = ensureDialog();
+
+        dialog.innerHTML = `
+            <div class="tc-date">${today.label}</div>
+            <div class="tc-title">Sign as ${name}?</div>
+            <div class="tc-confirm-buttons">
+                <button type="button" id="tcConfirmYes">Yes</button>
+                <button type="button" id="tcConfirmNo">No</button>
+            </div>
+        `;
+
+        document.getElementById("tcConfirmYes").addEventListener("click", () => {
+            saveCurrent({
+                key: today.key,
+                label: today.label,
+                signedBy: name,
+                signedAt: new Date().toISOString(),
+                followed: null
+            });
+            dialog.close();
+        });
+
+        document.getElementById("tcConfirmNo").addEventListener("click", () => {
+            showSignStep(today, name);
+        });
+    }
+
+
+    /* ---------- 5. PUBLIC API (used by Contract.html) --------------
+       Returns every contract — history plus today's in-progress one
+       if it exists — newest first, ready to render as a list.
+    ---------------------------------------------------------------*/
+
+    function getAllContracts() {
+        const history = loadHistory();
+        const current = loadCurrent();
+
+        const all = current ? [{ ...current, isActive: true }, ...history] : history;
+        return all;
+    }
+
+    function renderHistory(container) {
+        const contracts = getAllContracts();
+
+        if (contracts.length === 0) {
+            container.innerHTML = `<div class="tc-history-empty">No contracts signed yet.</div>`;
+            return;
+        }
+
+        container.innerHTML = contracts
+            .map((c) => {
+                let statusHtml;
+                if (c.isActive) {
+                    statusHtml = `<div class="tc-history-status pending">In progress</div>`;
+                } else if (c.followed === true) {
+                    statusHtml = `<div class="tc-history-status">&#10003;</div>`;
+                } else {
+                    statusHtml = `<div class="tc-history-status">&#10005;</div>`;
+                }
+
+                const signedTime = c.signedAt
+                    ? new Date(c.signedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                    : "";
+
+                return `
+                    <div class="tc-history-row">
+                        <div>
+                            <div class="tc-history-date">${c.label}</div>
+                            <div class="tc-history-signed">Signed by ${c.signedBy} at ${signedTime}</div>
+                        </div>
+                        ${statusHtml}
+                    </div>
+                `;
+            })
+            .join("");
+    }
+
+    // Expose the bits Contract.html needs.
+    window.TCContract = { getAllContracts, renderHistory };
+
+
+    /* ---------- 6. BOOT ---------------------------------------------
+       Decide what (if anything) needs to show, the moment the page
+       loads. This is the entire state machine:
+
+         no contract saved at all       -> sign today's contract
+         current.key === today's key    -> already handled, do nothing
+         current.key !== today's key    -> a new trading day started:
+             current.followed === null  -> ask review question first
+             (anything else)            -> just sign the new one
+    ---------------------------------------------------------------*/
+
+    function runContractCheck() {
+        const today = getTradingDayInfo();
+        const current = loadCurrent();
+
+        if (!current) {
+            showSignStep(today);
+            return;
+        }
+
+        if (current.key === today.key) {
+            // Still inside the trading day this contract was signed
+            // for — nothing to do, let the user use the app.
+            return;
+        }
+
+        // A new trading day has begun since `current` was created.
+        if (current.followed === null) {
+            showReviewStep(current, today);
+        } else {
+            // Leftover state (shouldn't normally happen since the
+            // dialog can't be dismissed mid-flow) — just recover by
+            // signing the new day's contract.
+            showSignStep(today);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        runContractCheck();
+
+        // If this page has a history list container, fill it in.
+        const historyContainer = document.getElementById("tcHistoryList");
+        if (historyContainer) {
+            renderHistory(historyContainer);
+        }
+    });
+
+})();
+</script>
+
+
+

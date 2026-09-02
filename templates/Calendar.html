@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">    
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='contract.css') }}">
+         <link rel="icon" type="image/png" href="{{ url_for('static', filename='TC.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/png" href="{{ url_for('static', filename='TC.png') }}">
+        <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+        
+        <style>
+          
+/* ── Variables ───────────────────────────────────────────── */
+:root {
+    --bg: #0a0e17;
+    --surface: #131a2c;
+    --surface-border: #2a3349;
+    --gold: #c9a227;
+    --gold-bright: #e0c158;
+    --text: #ece7da;
+    --text-muted: #8891a8;
+    --valid: #3f8f6f;
+    --invalid: #804439;
+    --scrim-gold: rgba(40, 32, 10, 0.93);
+    --scrim-error: rgba(8, 10, 16, 0.97);
+}
+
+/* ── Base ────────────────────────────────────────────────── */
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    padding: 0 8px;
+    box-sizing: border-box;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+button {
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--gold);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 14px;
+    width: 120px;
+    margin: 8px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.3s ease, box-shadow 0.5s ease;
+    align-self: center;
+}
+
+button:hover {
+    transform: translateY(-5px);
+    color: var(--gold-bright);
+    box-shadow: 0 0 14px rgba(185, 163, 108, 0.35);
+}
+
+.border-draw {
+    position: absolute;
+    inset: -2px;
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    pointer-events: none;
+}
+
+.border-draw path {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 2;
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+button:hover .border-draw path {
+    stroke-dashoffset: 0;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    width: 250px;
+    height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--surface-border);
+    padding-top: 80px;
+    z-index: 1000;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateX(0);
+}
+
+#sidebar.open {
+    transform: translateX(260px);
+}
+
+#menuBtn {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    z-index: 1001;
+    align-self: center;
+}
+
+#sidebar button {
+    display: block;
+    width: 60%;
+    margin: 7px auto;
+}
+
+#backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 999;
+}
+
+#backdrop.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* ── Heading ─────────────────────────────────────────────── */
+h1 {
+    max-width: 480px;
+    margin: 10px auto;
+    padding: 22px 24px;
+    border-top: 1px solid var(--surface-border);
+    border-bottom: 1px solid var(--surface-border);
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 25px;
+    line-height: 1.6;
+    color: var(--gold);
+}
+
+/* ── Month header ────────────────────────────────────────── */
+#monthLabel {
+    text-align: center;
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    margin: 10px auto 5px;
+    letter-spacing: 2px;
+}
+
+#monthlyPnl {
+    text-align: center;
+    margin: 0 auto 14px;
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 1px;
+}
+
+.monthly-label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 4px;
+}
+
+.monthly-value {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+    
+}
+
+/* ── Calendar grid ───────────────────────────────────────── */
+#weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    max-width: 1400px;
+    margin: 10px auto 6px;
+    text-align: center;
+    color: var(--gold);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    opacity: 0.8;
+}
+
+#calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-auto-rows: 105px;              /* rows split available height evenly, 5 or 6 rows */
+    gap: 5px;
+    max-width: 1400px;
+    margin: 0 auto;
+    height: min(72vh, 640px);         /* the cap — tune this number to taste */
+}
+
+/* ── Day cells ───────────────────────────────────────────── */
+.day {
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    border-radius: 10px;
+    min-height: 0;        /* was 100px — let the grid control height, not the cell */
+    padding: 10px;
+    color: var(--text);
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;     /* just in case content is taller than a compressed row */
+}
+
+.day:hover {
+    border-color: var(--gold);
+    
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+.day { transition: transform 0.1s ease-out, border-color 0.2s ease, box-shadow 0.2s ease; }
+
+.empty {
+    background: transparent;
+    border: none;
+    cursor: default;
+}
+
+.day.profit {
+    border-color: #2c77da9a;
+    background: #0b3a77cc;
+}
+
+.day.loss {
+    border-color: #3a3a3a;
+    background: rgba(30, 30, 30, 0.6);
+}
+
+.day-number {
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    color: white;
+    font-weight: 500;
+}
+
+.day-pnl {
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+    margin-top: 8px;
+}
+
+.pnl-positive { color: #2b68c4; }
+.pnl-negative { color: #5a5a5a; }
+
+.day-trades {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* ── Modal ───────────────────────────────────────────────── */
+dialog#dayModal {
+    background: var(--surface);
+    border: 1px solid var(--gold);
+    border-radius: 16px;
+    padding: 32px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    max-width: 380px;
+    width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+dialog#dayModal[open] {
+    animation: fadeIn 0.3s ease;
+}
+
+dialog#dayModal::backdrop {
+    background: rgba(8, 10, 16, 0.92);
+    backdrop-filter: blur(4px);
+}
+
+dialog#dayModal h3 {
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    margin: 0 0 20px 0;
+    letter-spacing: 1px;
+}
+
+dialog#dayModal label {
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+dialog#dayModal input,
+dialog#dayModal textarea {
+    display: block;
+    width: 100%;
+    margin-top: 6px;
+    background: var(--bg);
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    padding: 10px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+dialog#dayModal input:focus,
+dialog#dayModal textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.modal-buttons button {
+    width: auto;
+    padding: 10px 20px;
+    margin: 0;
+}
+
+/* ── Trade rows ──────────────────────────────────────────── */
+.trade-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.trade-row input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+}
+
+.trade-row input:focus {
+    outline: none;
+    border-color: var(--gold);
+}
+
+.remove-row {
+    background: transparent;
+    border: none;
+    color: var(--invalid);
+    cursor: pointer;
+    font-size: 16px;
+    width: auto;
+    padding: 4px 8px;
+    margin: 0;
+    min-width: unset;
+}
+
+.remove-row:hover {
+    transform: none;
+    box-shadow: none;
+    color: #e07060;
+}
+
+/* ── Confluence tags ─────────────────────────────────────── */
+.confluence-tag {
+    display: inline-block;
+    background: rgba(201, 162, 39, 0.1);
+    border: 1px solid rgba(201, 162, 39, 0.3);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 12px;
+    color: var(--gold);
+    margin: 2px;
+}
+
+.tag-remove {
+    cursor: pointer;
+    margin-left: 4px;
+    opacity: 0.6;
+    font-size: 10px;
+}
+
+.tag-remove:hover {
+    opacity: 1;
+}
+
+/* ── Mobile ──────────────────────────────────────────────── */
+@media (max-width: 600px) {
+    body { padding: 0 6px; }
+
+    h1 {
+        font-size: 18px;
+        padding: 14px 16px;
+        margin: 6px auto;
+    }
+
+    #monthLabel { font-size: 15px; }
+    .monthly-value { font-size: 18px; }
+
+    #weekdays {
+        font-size: 9px;
+        letter-spacing: 0px;
+        margin: 6px auto 4px;
+    }
+
+  .day {
+    min-height: 0;
+    padding: 5px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+#calendar {
+    height: min(65vh, 500px);
+}
+
+    .day:hover { transform: none; }
+
+    .day-number { font-size: 10px; }
+    .day-pnl { font-size: 10px; margin-top: 2px; }
+    .day-trades { font-size: 8px; }
+
+    dialog#dayModal input,
+    dialog#dayModal textarea { font-size: 16px; }
+
+    .remove-row { padding: 8px 12px; font-size: 18px; }
+
+    .modal-buttons button { padding: 14px 20px; font-size: 14px; }
+
+    #addTradeRow {
+        padding: 12px 16px !important;
+        font-size: 13px !important;
+    }
+
+    button:hover { transform: none; }
+}
+
+/* ── Desktop only ────────────────────────────────────────── */
+@media (min-width: 601px) {
+    h1 { transform: translateY(-50px); }
+}
+#monthNav{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+    max-width:500px;
+    margin:20px auto;
+}
+
+.monthBtn{
+    width:50px;
+    height:50px;
+    padding:0;
+    margin:0;
+    font-size:22px;
+}
+
+.monthBtn:disabled{
+    opacity:.35;
+    cursor:default;
+    transform:none;
+    box-shadow:none;
+}
+#streakBar {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 30px auto 8px;
+}
+
+.streak-group {
+    display: flex;
+    gap: 14px;
+}
+
+.streak-box {
+    position: relative;
+    width: 180px;
+    height: 75px;
+    background: var(--surface);
+    border-radius: 3px;
+   box-shadow: 0 0 4px rgba(201, 163, 39, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    padding-top: 10px;
+}
+.streak-box:hover{
+    transform:translateY(-3px);
+    cursor: pointer;
+     box-shadow: 0 0 8px rgb(201, 163, 39);
+}
+
+.streak-label {
+    font-size: 8px;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    position: absolute;
+    top: 3px;
+}
+
+.streak-fire {
+    width: 18px;
+    height: 18px;
+    fill: var(--gold);
+    
+}
+.streak-row {
+    display: flex;
+    align-items: center;
+   gap:6px;
+}
+
+
+.streak-num {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gold-bright);
+    font-family: 'Playfair Display', serif;
+    line-height: 1;
+}
+
+.streak-caption {
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.rules-btn.selected {
+    border-color: var(--gold);
+    color: var(--gold-bright);
+    box-shadow: 0 0 10px rgba(185,163,108,0.35);
+}
+.trade-row-full {
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+.mini-label { font-size: 10px; color: var(--text-muted); margin-right: 6px; }
+.mini-rules { margin: 6px 0; }
+.mini-rules-btn {
+    width: auto; padding: 4px 10px; margin: 0 4px 0 0; font-size: 11px;
+}
+.mini-rules-btn.selected {
+    border-color: var(--gold); color: var(--gold-bright);
+}
+.mini-confluence-add { display: flex; gap: 4px; margin-top: 4px; }
+.mini-confluence-input {
+    flex: 1; font-size: 12px; padding: 6px; background: var(--bg);
+    border: 1px solid var(--surface-border); border-radius: 6px; color: var(--text);
+}
+.mini-confluence-btn { width: auto; padding: 6px 10px; margin: 0; font-size: 11px; }
+
+.mini-confluence-trigger {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    padding: 4px 0;
+}
+.mini-confluence-trigger:hover {
+    color: var(--gold-bright);
+    text-decoration: underline;
+}
+
+
+
+</style>
+
+</head>
+
+<button id="menuBtn">☰</button>
+
+<script src="{{ url_for('static', filename='Contract.js') }}"></script>
+<script src="{{ url_for('static', filename='Nav.js') }}"></script>
+
+<body>
+
+<h1>Trade Journal</h1>
+
+<div id="backdrop"></div>
+
+<nav id="sidebar">
+    <button data-nav-key="checker" data-href="/">Trade Checker</button>
+    <button data-nav-key="journal" data-href="/calendar">Trade Journal</button>
+    <button data-nav-key="scanner" data-href="/index">Coin Scanner</button>
+    <button data-nav-key="chart" data-href="/chart">TradingView</button>
+    <button data-nav-key="contract" data-href="/contract">Daily Contract</button>
+</nav>
+
+
+
+<form>
+
+<div id="monthNav">
+    <button id="prevMonth" type="button" class="monthBtn">◀</button>
+
+    <div style="flex:1">
+        <div id="monthLabel"></div>
+        <div id="monthlyPnl"></div>
+    </div>
+
+    <button id="nextMonth"type="button" class="monthBtn">▶</button>
+</div>
+
+
+<div id="streakBar">
+    <div class="streak-group">
+        <div class="streak-box">
+            <span class="streak-label">All Time Best</span>
+              <div class="streak-row">
+                <span class="streak-num" id="winStreakBestNum">4</span>
+           <svg class="streak-fire" viewBox="0 0 24 24">
+    <path d="M12 2c-1.5 4-5 5.5-5 10a5 5 0 0 0 10 0c0-1.2-.8-2.2-1.3-3.3 2.4 1.2 3.8 3.6 3.8 6.3a6.5 6.5 0 0 1-13 0c0-5.8 4.3-7.2 5.5-13z" fill="url(#fireGrad)"/>
+    <path d="M12 9c-.6 2-2 2.6-2 4.6a2.4 2.4 0 0 0 4.8 0c0-.7-.4-1-.6-1.5.9.5 1.4 1.4 1.4 2.3a2.8 2.8 0 0 1-5.6 0c0-2.5 1.6-3.3 2-5.4z" fill="#0a0e17" opacity="0.55"/>
+    <defs>
+        <linearGradient id="fireGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e0c158"/>
+            <stop offset="55%" stop-color="#c9a227"/>
+            <stop offset="100%" stop-color="#7a6118"/>
+        </linearGradient>
+    </defs>
+</svg>
+            
+            </div>
+            <span class="streak-caption">Wins</span>
+        </div>
+        <div class="streak-box">
+            <span class="streak-label">All Time Best</span>
+              <div class="streak-row">
+                <span class="streak-num" id="ruleStreakBestNum">0</span>
+            <svg class="streak-fire" viewBox="0 0 24 24">
+    <path d="M12 2c-1.5 4-5 5.5-5 10a5 5 0 0 0 10 0c0-1.2-.8-2.2-1.3-3.3 2.4 1.2 3.8 3.6 3.8 6.3a6.5 6.5 0 0 1-13 0c0-5.8 4.3-7.2 5.5-13z" fill="url(#fireGrad)"/>
+    <path d="M12 9c-.6 2-2 2.6-2 4.6a2.4 2.4 0 0 0 4.8 0c0-.7-.4-1-.6-1.5.9.5 1.4 1.4 1.4 2.3a2.8 2.8 0 0 1-5.6 0c0-2.5 1.6-3.3 2-5.4z" fill="#0a0e17" opacity="0.55"/>
+    <defs>
+        <linearGradient id="fireGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e0c158"/>
+            <stop offset="55%" stop-color="#c9a227"/>
+            <stop offset="100%" stop-color="#7a6118"/>
+        </linearGradient>
+    </defs>
+</svg>
+            </div>
+            <span class="streak-caption">TC</span>
+        </div>
+    </div>
+
+    <div class="streak-group">
+        <div class="streak-box">
+            <span class="streak-label">Current</span>
+              <div class="streak-row">
+                <span class="streak-num" id="winStreakNum">0</span>
+            <svg class="streak-fire" viewBox="0 0 24 24">
+    <path d="M12 2c-1.5 4-5 5.5-5 10a5 5 0 0 0 10 0c0-1.2-.8-2.2-1.3-3.3 2.4 1.2 3.8 3.6 3.8 6.3a6.5 6.5 0 0 1-13 0c0-5.8 4.3-7.2 5.5-13z" fill="url(#fireGrad)"/>
+    <path d="M12 9c-.6 2-2 2.6-2 4.6a2.4 2.4 0 0 0 4.8 0c0-.7-.4-1-.6-1.5.9.5 1.4 1.4 1.4 2.3a2.8 2.8 0 0 1-5.6 0c0-2.5 1.6-3.3 2-5.4z" fill="#0a0e17" opacity="0.55"/>
+    <defs>
+        <linearGradient id="fireGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e0c158"/>
+            <stop offset="55%" stop-color="#c9a227"/>
+            <stop offset="100%" stop-color="#7a6118"/>
+        </linearGradient>
+    </defs>
+</svg>
+            
+            </div>
+            <span class="streak-caption">Wins</span>
+        </div>
+        <div class="streak-box">
+            <span class="streak-label">Current</span>
+              <div class="streak-row">
+                   <span class="streak-num" id="ruleStreakNum">0</span>
+           <svg class="streak-fire" viewBox="0 0 24 24">
+    <path d="M12 2c-1.5 4-5 5.5-5 10a5 5 0 0 0 10 0c0-1.2-.8-2.2-1.3-3.3 2.4 1.2 3.8 3.6 3.8 6.3a6.5 6.5 0 0 1-13 0c0-5.8 4.3-7.2 5.5-13z" fill="url(#fireGrad)"/>
+    <path d="M12 9c-.6 2-2 2.6-2 4.6a2.4 2.4 0 0 0 4.8 0c0-.7-.4-1-.6-1.5.9.5 1.4 1.4 1.4 2.3a2.8 2.8 0 0 1-5.6 0c0-2.5 1.6-3.3 2-5.4z" fill="#0a0e17" opacity="0.55"/>
+    <defs>
+        <linearGradient id="fireGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e0c158"/>
+            <stop offset="55%" stop-color="#c9a227"/>
+            <stop offset="100%" stop-color="#7a6118"/>
+        </linearGradient>
+    </defs>
+</svg>
+    
+            </div>
+            <span class="streak-caption">TC</span>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="weekdays">
+    <div>Sun</div>
+    <div>Mon</div>
+    <div>Tue</div>
+    <div>Wed</div>
+    <div>Thu</div>
+    <div>Fri</div>
+    <div>Sat</div>
+</div>
+
+
+<div id="calendar">
+</div>
+
+
+<dialog id="dayModal">
+    <h3 id="modalTitle"></h3>
+
+    <label style="font-size:12px; letter-spacing:1px; color:var(--text-muted); text-transform:uppercase;">
+        Trades
+    </label>
+
+    <div id="tradeRows" style="margin-top: 8px;"></div>
+
+    <button type="button" id="addTradeRow" style="width:auto; padding:8px 16px; margin: 8px 0 16px 0; font-size:12px;">
+        + Add Trade
+    </button>
+
+    <div id="dailyTotal" style="font-size:15px; font-weight:bold; margin-bottom:16px; color:var(--gold);"></div>
+
+
+
+
+ 
+
+
+    <label style="font-size:12px; letter-spacing:1px; color:var(--text-muted); text-transform:uppercase;">
+        Notes
+    </label>
+    <textarea id="inputNotes" rows="4" placeholder="What happened today..." style="display:block; width:100%; margin-top:6px; background:var(--bg); border:1px solid var(--surface-border); border-radius:8px; padding:10px; color:var(--text); font-family:'Inter',sans-serif; font-size:14px; box-sizing:border-box;"></textarea>
+
+    <br>
+    <div class="modal-buttons">
+        <button type="button" id="saveDay">Save</button>
+        <button type="button" id="closeDay">Cancel</button>
+    </div>
+</dialog>
+
+
+
+
+
+</form>
+
+
+</body>
+</html>
+
+<script>
+// ── Elements ──────────────────────────────────────────────
+
+const menuBtn  = document.getElementById('menuBtn');
+const sidebar  = document.getElementById('sidebar');
+const backdrop = document.getElementById('backdrop');
+const modal    = document.getElementById('dayModal');
+const calendar = document.getElementById('calendar');
+
+// ── Sidebar ───────────────────────────────────────────────
+function openSidebar()  { sidebar.classList.add('open');    backdrop.classList.add('open');    }
+function closeSidebar() { sidebar.classList.remove('open'); backdrop.classList.remove('open'); }
+
+menuBtn.addEventListener('click', () => {
+    sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+});
+backdrop.addEventListener('click', closeSidebar);
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSidebar();
+});
+
+
+// Intilt
+function initTilt(containerSelector, itemSelector, options = {}) {
+    const { max = 8, scale = 1.02 } = options;
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+
+    container.addEventListener('mousemove', (e) => {
+        const card = e.target.closest(itemSelector);
+        if (!card) return;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * -max;
+        const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * max;
+        card.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${scale})`;
+    });
+
+    container.addEventListener('mouseout', (e) => {
+        const card = e.target.closest(itemSelector);
+        if (!card) return;
+        if (e.relatedTarget && card.contains(e.relatedTarget)) return;
+        card.style.transform = '';
+    });
+}
+
+// ── Date setup ────────────────────────────────────────────
+
+
+const START_YEAR = 2026;
+const START_MONTH = 6; // July (0 = January)
+
+const today = new Date();
+
+let currentYear = Math.max(today.getFullYear(), START_YEAR);
+let currentMonth =
+    today.getFullYear() < START_YEAR
+        ? START_MONTH
+        : today.getFullYear() === START_YEAR
+            ? Math.max(today.getMonth(), START_MONTH)
+            : today.getMonth();
+
+const monthNames = [
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
+];
+
+function daysInCurrentMonth() {
+    return new Date(currentYear, currentMonth + 1, 0).getDate();
+}
+
+function firstDayOfCurrentMonth() {
+    return new Date(currentYear, currentMonth, 1).getDay();
+}
+
+function updateMonthLabel() {
+    document.getElementById("monthLabel").textContent =
+        `${monthNames[currentMonth]} ${currentYear}`;
+
+    document.getElementById("prevMonth").disabled =
+        currentYear === START_YEAR && currentMonth === START_MONTH;
+}
+
+function previousMonth() {
+
+    if (currentYear === START_YEAR && currentMonth === START_MONTH)
+        return;
+
+    currentMonth--;
+
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
+    migrateAllDays()
+    renderCalendar();
+}
+
+function nextMonth() {
+
+    currentMonth++;
+
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+
+    renderCalendar();
+}
+
+document
+    .getElementById("prevMonth")
+    .addEventListener("click", previousMonth);
+
+document
+    .getElementById("nextMonth")
+    .addEventListener("click", nextMonth);
+
+// ── localStorage helpers ──────────────────────────────────
+
+function storageKey(day) {
+    return `journal-${currentYear}-${currentMonth}-${day}`;
+}
+
+function loadDay(day) {
+
+    const raw = localStorage.getItem(storageKey(day));
+
+    return raw ? JSON.parse(raw) : null;
+}
+
+function saveDay(day, data) {
+
+    localStorage.setItem(
+        storageKey(day),
+        JSON.stringify(data)
+    );
+
+}
+
+// ── Monthly P&L ───────────────────────────────────────────
+// Monthly total — compound each day's already-compounded pnl
+function updateMonthlyPnl() {
+    let multiplier = 1;
+    let hasTrades = false;
+
+    for (let d = 1; d <= daysInCurrentMonth(); d++) {
+        const data = loadDay(d);
+        if (!data || data.pnl === null || data.pnl === undefined) continue;
+        multiplier *= (1 + data.pnl / 100);
+        hasTrades = true;
+    }
+
+    const el = document.getElementById("monthlyPnl");
+    if (!hasTrades) { el.innerHTML = ""; return; }
+
+    const total = (multiplier - 1) * 100;
+    const sign = total > 0 ? "+" : "";
+    el.innerHTML = `
+        <span class="monthly-label">Monthly P&L</span>
+        <span class="monthly-value" style="color:${total >= 0 ? "#2c77da" : "#4a4a4a"}">
+            ${sign}${total.toFixed(2)}%
+        </span>
+    `;
+}
+
+
+// ── Apply saved data to a day ─────────────────────────────
+
+function applyDayData(box, day) {
+
+    const data = loadDay(day);
+
+    box.classList.remove("profit", "loss");
+
+    box.querySelector(".day-pnl")?.remove();
+    box.querySelector(".day-trades")?.remove();
+
+    if (!data) return;
+
+    if (data.pnl > 0)
+        box.classList.add("profit");
+
+    if (data.pnl < 0)
+        box.classList.add("loss");
+
+    if (data.pnl !== null && data.pnl !== undefined) {
+
+        const pnl = document.createElement("div");
+
+        pnl.className =
+            "day-pnl " +
+            (data.pnl >= 0
+                ? "pnl-positive"
+                : "pnl-negative");
+
+        pnl.textContent =
+            (data.pnl > 0 ? "+" : "") +
+            data.pnl +
+            "%";
+
+        box.appendChild(pnl);
+
+    }
+
+    if (data.trades?.length) {
+
+        const trades = document.createElement("div");
+
+        trades.className = "day-trades";
+
+        trades.textContent =
+            `${data.trades.length} trade${data.trades.length===1?"":"s"}`;
+
+        box.appendChild(trades);
+
+    }
+
+}
+
+
+
+// ── Trade rows ────────────────────────────────────────────
+const MAX_TRADES = 3;
+
+function updateAddButton() {
+    const btn   = document.getElementById('addTradeRow');
+  const count = document.querySelectorAll('.trade-row-full').length;
+    btn.style.opacity       = count >= MAX_TRADES ? '0.4' : '1';
+    btn.style.pointerEvents = count >= MAX_TRADES ? 'none' : 'auto';
+}
+
+function addTradeRow(trade = {}) {
+    if (document.querySelectorAll('.trade-row-full').length >= MAX_TRADES) return;
+
+    const pnl = trade.pnl ?? '';
+    const followedRules = trade.followedRules ?? null;
+    const confluences = trade.confluences || [];
+
+    const wrap = document.createElement('div');
+    wrap.classList.add('trade-row-full');
+
+    wrap.innerHTML = `
+        <div class="trade-row">
+            <input type="number" step="0.1" class="trade-pnl" placeholder="e.g. 4.5 or -2.3" value="${pnl}">
+            <button type="button" class="remove-row">✕</button>
+        </div>
+        <div class="mini-rules">
+            <span class="mini-label">Followed rules?</span>
+            <button type="button" class="mini-rules-btn" data-val="yes">Yes</button>
+            <button type="button" class="mini-rules-btn" data-val="no">No</button>
+        </div>
+      <div class="mini-confluences">
+    <div class="mini-confluence-display"></div>
+    <span class="mini-confluence-trigger">+ Add Confluence</span>
+    <div class="mini-confluence-add" style="display:none;">
+        <input type="text" class="mini-confluence-input" placeholder="Add confluence...">
+        <button type="button" class="mini-confluence-btn">+</button>
+    </div>
+</div>
+    `;
+
+    // pnl total recalculation
+wrap.querySelector('.trade-pnl').addEventListener('input', recalculateTotal);
+
+    // remove row
+    wrap.querySelector('.remove-row').addEventListener('click', () => {
+        wrap.remove();
+        recalculateTotal();
+        updateAddButton();
+    });
+
+    // rules toggle (scoped to this row only)
+    const rulesBtns = wrap.querySelectorAll('.mini-rules-btn');
+    function setRulesUI(val) {
+        rulesBtns.forEach(b => b.classList.toggle('selected', b.dataset.val === val));
+        wrap.dataset.followedRules = val === null ? '' : (val === 'yes');
+    }
+    rulesBtns.forEach(btn => {
+        btn.addEventListener('click', () => setRulesUI(btn.dataset.val));
+    });
+    setRulesUI(followedRules === true ? 'yes' : followedRules === false ? 'no' : null);
+
+    // confluences (scoped to this row only)
+    const display = wrap.querySelector('.mini-confluence-display');
+    function renderMiniTags(tags) {
+        display.innerHTML = '';
+        tags.forEach(name => {
+            const tag = document.createElement('span');
+            tag.classList.add('confluence-tag');
+            tag.innerHTML = `${name} <span class="tag-remove">✕</span>`;
+            tag.querySelector('.tag-remove').addEventListener('click', () => {
+                const i = wrap._confluences.indexOf(name);
+                if (i > -1) wrap._confluences.splice(i, 1);
+                renderMiniTags(wrap._confluences);
+            });
+            display.appendChild(tag);
+        });
+    }
+    wrap._confluences = [...confluences];
+    renderMiniTags(wrap._confluences);
+
+    const trigger = wrap.querySelector('.mini-confluence-trigger');
+    const addBox = wrap.querySelector('.mini-confluence-add');
+    const confluenceInput = wrap.querySelector('.mini-confluence-input');
+
+    trigger.addEventListener('click', () => {
+        addBox.style.display = 'flex';
+        trigger.style.display = 'none';
+        confluenceInput.focus();
+    });
+
+    wrap.querySelector('.mini-confluence-btn').addEventListener('click', () => {
+        const val = confluenceInput.value.trim();
+        if (!val) return;
+        wrap._confluences.push(val);
+        renderMiniTags(wrap._confluences);
+        confluenceInput.value = '';
+        addBox.style.display = 'none';
+        trigger.style.display = 'inline-block';
+    });
+
+    document.getElementById('tradeRows').appendChild(wrap);
+    updateAddButton();
+}
+
+// Daily total while editing a day
+function recalculateTotal() {
+  const inputs = document.querySelectorAll('.trade-pnl'); // was '.trade-row input'
+    let multiplier = 1, count = 0;
+
+    inputs.forEach(input => {
+        const val = parseFloat(input.value);
+        if (!isNaN(val)) {
+            multiplier *= (1 + val / 100);
+            count++;
+        }
+    });
+
+    const el = document.getElementById('dailyTotal');
+    if (count === 0) { el.textContent = ''; return; }
+
+    const total = (multiplier - 1) * 100;
+    const sign = total > 0 ? '+' : '';
+    el.textContent = `Daily P&L: ${sign}${total.toFixed(2)}%`;
+    el.style.color = total > 0 ? 'var(--valid)' : total < 0 ? 'var(--invalid)' : 'var(--gold)';
+}
+
+// ── Build calendar ────────────────────────────────────────
+// ── Calendar ──────────────────────────────────────────────
+function migrateAllDays() {
+
+
+    for (const key in localStorage) {
+        if (!key.startsWith('journal-')) continue;
+        try {
+            const data = JSON.parse(localStorage.getItem(key));
+            if (data.trades && data.trades.length && typeof data.trades[0] === 'number') {
+    data.trades = data.trades.map((val, i) => ({
+        pnl: val,
+        followedRules: i === 0 ? (data.followedRules ?? null) : null,
+        confluences: i === 0 ? (data.confluences || []) : []
+    }));
+    localStorage.setItem(key, JSON.stringify(data));
+}
+            if (data.trades && data.trades.length) {
+                let multiplier = 1;
+                data.trades.forEach(t => multiplier *= (1 + t.pnl / 100));
+                data.pnl = parseFloat(((multiplier - 1) * 100).toFixed(2));
+                localStorage.setItem(key, JSON.stringify(data));
+            }
+        } catch (e) { /* skip malformed entries */ }
+    }
+}
+
+function getAllTradesSorted() {
+    const dayEntries = [];
+    for (const key in localStorage) {
+        const m = key.match(/^journal-(\d+)-(\d+)-(\d+)$/);
+        if (!m) continue;
+        const [, y, mo, d] = m.map(Number);
+        let data;
+        try { data = JSON.parse(localStorage.getItem(key)); } catch (e) { continue; }
+        if (!data.trades?.length) continue;
+        dayEntries.push({ date: new Date(y, mo, d), trades: data.trades });
+    }
+    dayEntries.sort((a, b) => a.date - b.date);
+    return dayEntries.flatMap(e => e.trades);
+}
+
+function computeStreaks() {
+    const trades = getAllTradesSorted();
+    let winStreak = 0, ruleStreak = 0;
+    let winBest = parseInt(localStorage.getItem('winStreakBest') || '4', 10);
+    let ruleBest = parseInt(localStorage.getItem('ruleStreakBest') || '0', 10);
+
+    trades.forEach(t => {
+        winStreak = t.pnl > 0 ? winStreak + 1 : 0;
+        if (winStreak > winBest) winBest = winStreak;
+
+        if (t.followedRules === true) ruleStreak += 1;
+        else if (t.followedRules === false) ruleStreak = 0;
+
+        if (ruleStreak > ruleBest) ruleBest = ruleStreak;
+    });
+
+    localStorage.setItem('winStreakBest', winBest);
+    localStorage.setItem('ruleStreakBest', ruleBest);
+    return { winStreak, winBest, ruleStreak, ruleBest };
+}
+
+function renderStreaks() {
+    const { winStreak, winBest, ruleStreak, ruleBest } = computeStreaks();
+    document.getElementById('winStreakNum').textContent = winStreak;
+    document.getElementById('winStreakBestNum').textContent = winBest;
+    document.getElementById('ruleStreakNum').textContent = ruleStreak;
+    document.getElementById('ruleStreakBestNum').textContent = ruleBest;
+}
+
+
+let activeDay = null;
+
+function renderCalendar() {
+
+    calendar.innerHTML = "";
+
+    updateMonthLabel();
+
+    const daysInMonth = daysInCurrentMonth();
+    const firstDay = firstDayOfCurrentMonth();
+
+    for (let i = 0; i < firstDay; i++) {
+
+        const empty = document.createElement("div");
+        empty.className = "day empty";
+
+        calendar.appendChild(empty);
+
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+
+        const box = document.createElement("div");
+        box.className = "day";
+
+        const number = document.createElement("div");
+        number.className = "day-number";
+        number.textContent = day;
+
+        box.appendChild(number);
+
+        applyDayData(box, day);
+
+        box.addEventListener("click", () => openDay(day));
+
+        calendar.appendChild(box);
+
+    }
+
+    updateMonthlyPnl();
+
+}
+
+function openDay(day) {
+
+    activeDay = day;
+
+    const data = loadDay(day) || {};
+
+    document.getElementById("modalTitle").textContent =
+        `${monthNames[currentMonth]} ${day}, ${currentYear}`;
+
+    document.getElementById("inputNotes").value =
+        data.notes ?? "";
+
+    const rows = document.getElementById("tradeRows");
+
+    rows.innerHTML = "";
+    if (data.trades?.length) {
+        data.trades.forEach(addTradeRow);
+        recalculateTotal();
+    } else {
+        addTradeRow();
+    }
+
+    updateAddButton();
+
+    modal.showModal();
+
+}
+migrateAllDays();
+renderCalendar();
+// ── Modal buttons ─────────────────────────────────────────
+
+document.getElementById("addTradeRow").addEventListener("click", () => {
+    addTradeRow();
+});
+
+document.getElementById("saveDay").addEventListener("click", () => {
+
+// Inside the saveDay click handler — replace the total calculation
+const rows = document.querySelectorAll('.trade-row-full');
+const trades = [];
+let multiplier = 1;
+
+rows.forEach(wrap => {
+    const val = parseFloat(wrap.querySelector('.trade-pnl').value);
+    if (isNaN(val)) return;
+    multiplier *= (1 + val / 100);
+    trades.push({
+        pnl: val,
+        followedRules: wrap.dataset.followedRules === '' ? null : wrap.dataset.followedRules === 'true',
+        confluences: [...wrap._confluences]
+    });
+});
+
+const total = (multiplier - 1) * 100;
+const notes = document.getElementById("inputNotes").value;
+
+saveDay(activeDay, {
+    trades,
+    pnl: trades.length ? parseFloat(total.toFixed(2)) : null,
+    notes
+});
+
+renderCalendar();
+renderStreaks();
+modal.close();
+});
+
+initTilt('#calendar', '.day:not(.empty)');
+
+</script>

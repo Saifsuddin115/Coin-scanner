@@ -1,0 +1,652 @@
+{
+  "POND": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Marlin is a layer-0 protocol focused on decentralized infrastructure and network latency improvements, which does not involve prohibited financial activities like interest or gambling."
+  },
+  "OXT": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "The project is a decentralized VPN service focused on privacy and bandwidth utility, which does not involve interest, gambling, or prohibited derivatives."
+  },
+  "PUMP": {
+    "status": "haram",
+    "confidence score": 0.9,
+    "reason": "The platform's primary mechanism relies on the gamified creation and 'bonding curve' speculation of meme coins, which functions essentially as a form of high-risk gambling."
+  },
+  "MET": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Meteora functions as a decentralized liquidity protocol for yield generation through automated market making, which does not inherently involve interest-based lending or prohibited derivatives."
+  },
+  "DNT": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "The project serves as a decentralized platform for creating and managing marketplaces and communities, which does not inherently involve interest, gambling, or prohibited derivatives."
+  },
+  "ZAMA": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "Zama focuses on Fully Homomorphic Encryption (FHE) to enhance privacy and data security in blockchain, which does not inherently involve prohibited financial activities."
+  },
+  "BOBA": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Boba Network is a Layer 2 scaling solution for Ethereum focused on transaction throughput and smart contract utility, rather than interest-based lending or gambling."
+  },
+  "XAN": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Anoma functions as a decentralized architecture for intent-centric trade and privacy-preserving protocols, which does not inherently involve interest, gambling, or prohibited derivatives."
+  },
+  "CAP": {
+    "status": "unclear",
+    "confidence score": 0.5,
+    "reason": "The project name 'Cap' is too generic to determine its underlying utility, purpose, or economic model without further documentation."
+  },
+  "ICNT": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "The project is a decentralized cloud storage infrastructure focused on data utility rather than prohibited financial activities like interest-bearing lending or gambling."
+  },
+  "JTO": {
+    "status": "likely haram",
+    "confidence score": 0.85,
+    "reason": "Jito is a liquid staking protocol that generates rewards through underlying validator earnings and MEV extraction, which functions essentially as interest-bearing finance."
+  },
+  "GHST": {
+    "status": "unclear",
+    "confidence score": 0.7,
+    "reason": "While primarily a gamified NFT ecosystem, Aavegotchi's underlying architecture is built on Aave, a decentralized lending protocol that relies on interest-based mechanisms which may conflict with Islamic finance principles."
+  },
+  "O": {
+    "status": "halal",
+    "confidence score": 0.8,
+    "reason": "The project functions as a decentralized exchange for spot trading, which does not inherently involve interest, prohibited derivatives, or gambling mechanisms."
+  },
+  "AZTEC": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Aztec is a privacy-focused layer-two scaling solution for Ethereum and does not function as a lending, gambling, or leveraged derivatives platform."
+  },
+  "RSR": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "The project functions as a dual-token system for decentralized stablecoins and does not inherently rely on interest-bearing lending or gambling mechanisms."
+  },
+  "DOOD": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Doodles is primarily a collection of digital art and community-focused NFTs, which do not inherently involve interest, gambling, or leveraged derivatives."
+  },
+  "ROBO": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Fabric Protocol functions as a liquidity layer for tokenized assets and cross-chain messaging, which does not inherently involve interest, gambling, or leveraged derivatives."
+  },
+  "MOG": {
+    "status": "haram",
+    "confidence score": 100,
+    "reason": "Mog Coin is explicitly classified as a meme coin, which falls under the prohibited categories provided in the instructions."
+  },
+  "ARX": {
+    "status": "halal",
+    "confidence score": 90,
+    "reason": "Arcium functions as a decentralized confidential computing network focused on privacy and secure data processing rather than speculative finance or lending."
+  },
+  "00": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "There is insufficient public information regarding the specific utility or whitepaper of '00 Token' to determine its primary purpose."
+  },
+  "NEON": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Neon EVM is a technical infrastructure layer that enables Ethereum-based smart contracts on Solana, providing utility for decentralized applications rather than facilitating prohibited financial activities."
+  },
+  "ALICE": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "MyNeighborAlice is a blockchain-based game centered on land ownership and resource management within a virtual world, which does not inherently involve interest, gambling, or prohibited financial derivatives."
+  },
+  "USELESS": {
+    "status": "haram",
+    "confidence score": 10,
+    "reason": "The project is explicitly categorized as a meme coin, which falls under your defined criteria for haram."
+  },
+  "PRIME": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Echelon Prime is a Web3 gaming ecosystem focused on digital asset utility and game infrastructure rather than lending, gambling, or derivative trading."
+  },
+  "VIRTUAL": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "Virtuals Protocol focuses on the creation and infrastructure of AI agents for the virtual economy, which does not fall under the prohibited categories of interest, gambling, or derivative speculation."
+  },
+  "IDEX": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "IDEX is a decentralized exchange protocol focused on spot trading, which functions as a digital marketplace without inherent interest-based lending or gambling mechanisms."
+  },
+  "SPX": {
+    "status": "haram",
+    "confidence score": 10,
+    "reason": "The project is explicitly categorized as a meme coin, which falls under the prohibited activities criteria provided."
+  },
+  "KITE": {
+    "status": "unclear",
+    "confidence score": 0.5,
+    "reason": "Kite represents a generic name used by multiple distinct blockchain projects, requiring specific documentation on the protocol's primary utility to confirm compliance."
+  },
+  "SYND": {
+    "status": "unclear",
+    "confidence score": 0.5,
+    "reason": "There is insufficient public information regarding the specific utility of the Syndicate (SYND) project to determine if it aligns with Islamic finance principles."
+  },
+  "BONK": {
+    "status": "haram",
+    "confidence score": 10,
+    "reason": "Bonk is classified as a meme coin, which falls under the prohibited categories defined in the screening criteria."
+  },
+  "RSC": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "The project is focused on academic and research-based utility, which does not involve prohibited financial activities like interest, gambling, or speculative derivatives."
+  },
+  "CHECK": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "The provided information does not describe the utility or purpose of the 'Checkmate' project, making it impossible to evaluate against Shariah compliance criteria."
+  },
+  "LDO": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "The primary purpose of Lido is decentralized liquid staking, which acts as a mechanism for validating Proof-of-Stake networks rather than engaging in prohibited interest-based lending or gambling."
+  },
+  "TOWNS": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Towns Protocol is a decentralized protocol for creating and managing community-owned digital spaces, which functions as a communication and organizational utility rather than a financial product."
+  },
+  "ERA": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Caldera is a platform for deploying application-specific rollups (L2s), which provides utility in blockchain scalability and infrastructure rather than engaging in interest, gambling, or speculative derivatives."
+  },
+  "LA": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Lagrange is a modular interoperability and zero-knowledge proof infrastructure protocol, which serves as a technological utility rather than a financial product based on interest, gambling, or speculation."
+  },
+  "TREE": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "Treehouse is primarily a data analytics and asset management platform for decentralized finance, which does not inherently rely on prohibited activities as its core utility."
+  },
+  "IRYS": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Irys functions as a permanent data storage protocol (decentralized archival layer) and does not involve interest-bearing, gambling, or leveraged derivatives mechanisms."
+  },
+  "NKN": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "NKN is a decentralized data transmission network focused on peer-to-peer connectivity and bandwidth sharing, which does not involve prohibited financial activities."
+  },
+  "EDGE": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Definitive is a decentralized asset management platform focused on automated vault strategies and portfolio rebalancing, which does not inherently involve forbidden financial practices."
+  },
+  "IMU": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "ImmuneFi acts as a decentralized bug bounty platform for cybersecurity, which facilitates the protection of digital assets rather than engaging in prohibited financial activities."
+  },
+  "ONDO": {
+    "status": "haram",
+    "confidence score": 0.9,
+    "reason": "Ondo's primary utility revolves around the tokenization of Real World Assets (RWAs) like U.S. Treasury bonds, which function through interest-bearing debt instruments."
+  },
+  "VVV": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "There is insufficient public information regarding the specific utility or underlying economic model of the Venice Token to determine its compliance."
+  },
+  "ALLO": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Allora is a decentralized machine learning network focused on optimizing predictive modeling and intelligence, which does not inherently involve prohibited financial activities."
+  },
+  "CFG": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Centrifuge focuses on the tokenization of real-world assets (RWA) to facilitate decentralized financing for businesses, which aligns with Shariah-compliant asset-backed financing principles."
+  },
+  "LQTY": {
+    "status": "haram",
+    "confidence score": 0.95,
+    "reason": "The protocol's primary utility is providing interest-free loans collateralized by ETH, which fundamentally functions as a lending platform."
+  },
+  "HIGH": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Highstreet is a commerce-centered metaverse and play-to-earn platform focused on retail and gaming utility, which does not involve prohibited financial activities."
+  },
+  "REZ": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "Renzo functions as a liquid restaking protocol for Ethereum, focusing on participation in network security rather than interest-based lending, leverage, or gambling."
+  },
+  "KEYCAT": {
+    "status": "haram",
+    "confidence score": 100,
+    "reason": "The project is classified as a meme coin, which falls under the explicit criteria for haram projects provided in your instructions."
+  },
+  "PLUME": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "Plume is a modular Layer 2 blockchain focused on real-world asset (RWA) tokenization, which facilitates asset-backed utility rather than interest-based lending or gambling."
+  },
+  "1INCH": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "1inch acts as a decentralized exchange aggregator that facilitates direct token swaps without interest-bearing lending or leveraged derivative mechanisms as its primary utility."
+  },
+  "OPN": {
+    "status": "unclear",
+    "confidence score": 0.5,
+    "reason": "The project lacks a clear, publicly defined primary utility or whitepaper detailing its functional purpose beyond being a ticker symbol."
+  },
+  "ZRO": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "LayerZero is an interoperability protocol designed for cross-chain messaging and data transfer, which serves as foundational infrastructure rather than prohibited financial activity."
+  },
+  "BOBBOB": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "BOB functions as a Bitcoin-compatible hybrid Layer-2 network focused on smart contract utility and decentralized applications rather than lending, gambling, or speculative meme coin creation."
+  },
+  "AAVE": {
+    "status": "haram",
+    "confidence score": 1,
+    "reason": "The primary utility and core mechanism of Aave is decentralized lending and borrowing based on interest rates (yield), which constitutes Riba."
+  },
+  "AI": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Gensyn is a decentralized protocol for distributed machine learning compute, which constitutes a productive utility rather than interest-based, gambling, or speculative finance."
+  },
+  "FLR": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Flare is a layer-1 blockchain designed to provide decentralized data interoperability, which functions as a neutral utility infrastructure."
+  },
+  "ARKM": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Arkham functions as an on-chain data analytics and intelligence platform, which provides utility through information services rather than prohibited financial activities."
+  },
+  "TON": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "TON is a layer-1 blockchain designed for utility, decentralized applications, and payments, which does not inherently involve interest, gambling, or prohibited derivatives."
+  },
+  "BAL": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "Balancer is a decentralized automated market maker (AMM) protocol that facilitates non-custodial token swaps and liquidity provision, which functions primarily as a decentralized exchange utility."
+  },
+  "OMNI": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Omni Network is a Layer 1 blockchain designed to provide interoperability between Ethereum rollups, serving as a functional utility infrastructure rather than a speculative or prohibited financial instrument."
+  },
+  "LIGHTER": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Lighter is a decentralized exchange protocol focused on spot trading, which does not inherently involve interest, leverage, or gambling mechanisms."
+  },
+  "BIO": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Bio Protocol operates as a decentralized autonomous organization (DAO) focused on funding and accelerating scientific research in longevity and biotechnology, which aligns with productive economic activity."
+  },
+  "ESP": {
+    "status": "unclear",
+    "confidence score": 0.5,
+    "reason": "There are multiple projects named Espresso in the cryptocurrency space, making it impossible to identify a primary utility without a specific whitepaper or official website reference."
+  },
+  "KAIO": {
+    "status": "unclear",
+    "confidence score": 0.5,
+    "reason": "There is insufficient public information regarding the specific utility and underlying business model of the Kaio project to confirm its compliance status."
+  },
+  "EUL": {
+    "status": "haram",
+    "confidence score": 0.95,
+    "reason": "Euler Finance is primarily a decentralized lending and borrowing protocol that relies on interest-based mechanisms, which is contrary to Islamic finance principles regarding Riba."
+  },
+  "DIA": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "DIA is a cross-chain oracle platform providing data feeds for smart contracts, which serves as legitimate infrastructure for decentralized finance applications."
+  },
+  "TROLL": {
+    "status": "haram",
+    "confidence score": 1,
+    "reason": "The project is categorized as a meme coin, which falls under the exclusionary criteria provided."
+  },
+  "SAFE": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Safe is a decentralized governance and asset management protocol that facilitates self-custody and secure asset storage, which aligns with Islamic financial principles of ownership and security."
+  },
+  "THQ": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "Theoriq functions as an AI agent protocol focused on interoperability and decentralized automation rather than lending, gambling, or interest-based finance."
+  },
+  "KAITO": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Kaito functions as an AI-powered information aggregator for the crypto market, which does not involve prohibited financial activities like interest, gambling, or speculation."
+  },
+  "SUP": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Superfluid is a protocol for programmable, real-time cash flows and token streaming, which serves as a utility for asset transfers rather than interest-bearing lending or gambling."
+  },
+  "PRL": {
+    "status": "unclear",
+    "confidence score": 0.5,
+    "reason": "There is insufficient public information regarding the specific utility or whitepaper of a project named 'Perle' to determine if its primary purpose falls into restricted categories."
+  },
+  "COTI": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "COTI is primarily an enterprise-grade fintech platform focused on payment infrastructure, privacy, and decentralized finance technology rather than prohibited activities like interest-based lending or gambling."
+  },
+  "PROS": {
+    "status": "halal",
+    "confidence score": 95,
+    "reason": "Pharos functions as a decentralized infrastructure protocol for network telemetry and data validation, which does not involve interest, gambling, or prohibited derivative speculation."
+  },
+  "GWEI": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "The project serves as a utility token for transaction fees on the Ethereum network and does not involve interest, gambling, or prohibited derivative products."
+  },
+  "KMNO": {
+    "status": "haram",
+    "confidence score": 0.9,
+    "reason": "Kamino's primary utility is centered around automated liquidity management, yield generation, and lending protocols which rely on interest-based mechanisms."
+  },
+  "SWELL": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "SWELL functions as a governance and utility token for a decentralized liquidity protocol focused on liquid staking, which aligns with profit-sharing principles rather than interest-based lending."
+  },
+  "ACH": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Alchemy Pay acts as a payment gateway facilitating fiat-to-crypto transactions and merchant settlements, which functions as a utility for digital commerce rather than interest, gambling, or speculation."
+  },
+  "FLOW": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Flow is a layer-one blockchain protocol designed for decentralized applications, NFTs, and gaming utility rather than lending or speculative derivatives."
+  },
+  "PROMPT": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "There is insufficient information regarding the specific utility or technical implementation of the Wayfinder (PROMPT) project to make a definitive assessment."
+  },
+  "INDEX": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "The project primarily focuses on decentralized asset management through index products, which represent ownership in underlying tokens rather than interest-bearing or speculative derivative products."
+  },
+  "META": {
+    "status": "unclear",
+    "confidence score": 0.5,
+    "reason": "The project name 'MetaDAO' is generic and lacks specific information regarding its primary utility, making it impossible to determine if its core function complies with Sharia principles."
+  },
+  "RE": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "The project 'RE' lacks sufficient public documentation or a defined utility to determine its compliance status."
+  },
+  "PLU": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Pluton is a loyalty reward token for the Plutus platform, functioning as a utility token for cashback and merchant discounts rather than interest or gambling."
+  },
+  "RAVE": {
+    "status": "unclear",
+    "confidence score": 0.5,
+    "reason": "The project's primary utility is not clearly defined in public documentation, preventing a determination of whether its core function aligns with Sharia principles."
+  },
+  "SENT": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "Sentient is an artificial intelligence platform focused on decentralized model development, which does not inherently involve interest, gambling, or prohibited financial derivatives."
+  },
+  "ELA": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Elastos is a decentralized infrastructure project focused on building a secure, smart-web ecosystem with identity and data ownership, which does not inherently involve prohibited financial activities."
+  },
+  "UP": {
+    "status": "haram",
+    "confidence score": 0.9,
+    "reason": "Superform functions primarily as a cross-chain yield aggregator that facilitates automated lending and borrowing strategies to earn interest."
+  },
+  "BLEND": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Fluent (BLEND) is a decentralized bridge protocol focused on cross-chain interoperability and liquidity transfer, which does not involve interest-based lending, leverage, or gambling."
+  },
+  "DBR": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "deBridge is a cross-chain interoperability protocol focused on token bridging and liquidity transfer, which does not involve interest, gambling, or prohibited derivative speculation as its primary utility."
+  },
+  "SHDW": {
+    "status": "unclear",
+    "confidence score": 0.5,
+    "reason": "The project lacks a clear, publicly defined primary utility, making it impossible to determine if its core function aligns with Sharia-compliant principles."
+  },
+  "WMTX": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "The project serves as a decentralized utility token for a telecommunications network, facilitating connectivity rather than speculation or interest-based financial services."
+  },
+  "GODS": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Gods Unchained is a play-to-earn digital collectible card game where the primary utility is gaming and NFT ownership, which does not inherently involve interest, gambling, or prohibited derivatives."
+  },
+  "DRV": {
+    "status": "haram",
+    "confidence score": 0.95,
+    "reason": "The project's primary utility is centered on decentralized perpetual futures and leveraged derivatives trading."
+  },
+  "GRVT": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "GRVT is a hybrid exchange platform focusing on order book execution and self-custody rather than interest-based lending or gambling."
+  },
+  "BIRB": {
+    "status": "haram",
+    "confidence score": 0.95,
+    "reason": "The project is classified as a meme coin, which falls under the specified criteria for haram projects."
+  },
+  "FIS": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "StaFi operates as a liquid staking protocol for proof-of-stake networks, which functions as a profit-sharing utility rather than interest-based lending or prohibited speculation."
+  },
+  "CLANKER": {
+    "status": "haram",
+    "confidence score": 0.95,
+    "reason": "The project is explicitly marketed and functioning as a meme coin, which falls under your defined criteria for haram classification."
+  },
+  "HOME": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "The provided information lacks a description of the project's primary utility, making it impossible to determine compliance."
+  },
+  "TURBO": {
+    "status": "haram",
+    "confidence score": 10,
+    "reason": "Turbo is classified as a meme coin, which falls under the project's predefined criteria for a haram classification."
+  },
+  "FUN1": {
+    "status": "haram",
+    "confidence score": 0.95,
+    "reason": "The project is explicitly categorized as a meme coin, which falls under the exclusionary criteria provided."
+  },
+  "VOXEL": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Voxies is a tactical RPG gaming ecosystem where the token is used for in-game utility, character customization, and marketplace transactions rather than speculative gambling or interest-based finance."
+  },
+  "AIOZ": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "AIOZ Network is a decentralized content delivery network (dCDN) and media infrastructure project focused on storage, transcoding, and streaming, which provides clear real-world utility."
+  },
+  "NEX": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "The provided information does not describe the utility or primary purpose of the Nexus (NEX) project."
+  },
+  "SQD": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Subsquid provides decentralized data indexing and query infrastructure, which serves a legitimate utility in blockchain technology and does not involve prohibited financial activities."
+  },
+  "GFI": {
+    "status": "haram",
+    "confidence score": 10,
+    "reason": "The primary utility of the Goldfinch protocol is decentralized credit and lending, which involves the charging and earning of interest."
+  },
+  "WLD": {
+    "status": "unclear",
+    "confidence score": 0.7,
+    "reason": "While the project focuses on digital identity and universal basic income, the underlying mechanics of its token distribution and potential speculative nature create ambiguity regarding its primary utility."
+  },
+  "MON": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Monad is a high-performance Layer 1 blockchain infrastructure designed for general-purpose decentralized applications and smart contracts."
+  },
+  "SXT": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Space and Time is a decentralized data warehouse providing verifiable compute and indexing for blockchain data, which serves a functional utility without involving interest, gambling, or prohibited derivatives."
+  },
+  "BLZ": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Bluzelle is a decentralized data storage network focused on providing scalable database solutions for dApps, which is a productive utility rather than a speculative financial product."
+  },
+  "SPK": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "The provided information does not describe the utility or primary purpose of the 'Spark' project, making it impossible to assess its compliance."
+  },
+  "MORPHO": {
+    "status": "haram",
+    "confidence score": 95,
+    "reason": "The primary utility of the Morpho protocol is the creation of lending and borrowing markets that rely on interest-based mechanisms."
+  },
+  "FARM": {
+    "status": "haram",
+    "confidence score": 0.95,
+    "reason": "The project's primary utility is centered on automated yield farming and liquidity provisioning, which inherently relies on interest-bearing mechanisms and Riba-based protocols."
+  },
+  "TRAC": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "OriginTrail operates as a decentralized knowledge graph for supply chain transparency and data integrity, which provides tangible utility outside of prohibited financial activities."
+  },
+  "PENGU": {
+    "status": "haram",
+    "confidence score": 0.9,
+    "reason": "Pudgy Penguins is categorized as a meme-based NFT collection, which lacks underlying Sharia-compliant utility."
+  },
+  "DOGINME": {
+    "status": "haram",
+    "confidence score": 10,
+    "reason": "The project is explicitly categorized as a meme coin, which falls under the prohibited activities criteria provided."
+  },
+  "SUPER": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "SuperVerse is a Web3 gaming ecosystem focused on NFT infrastructure and digital asset management, which does not fall under the prohibited categories of interest, gambling, or leveraged derivatives."
+  },
+  "ZORA": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Zora is an NFT marketplace and protocol focused on creative media and digital ownership, which does not involve interest, gambling, or leveraged derivatives."
+  },
+  "TRUMP": {
+    "status": "haram",
+    "confidence score": 0.95,
+    "reason": "The project is classified as a meme coin, which falls under the specified criteria for haram projects."
+  },
+  "HONEY": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Hivemapper is a decentralized mapping network where contributors are rewarded for providing real-world geospatial data, which constitutes a service-based utility rather than prohibited financial speculation or gambling."
+  },
+  "BASECAT": {
+    "status": "haram",
+    "confidence score": 10,
+    "reason": "Basecat is identified as a meme coin, which falls under the exclusionary criteria provided."
+  },
+  "MDT": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "The project functions as a decentralized data exchange marketplace, which is a permissible economic activity involving the trade of utility-based digital assets."
+  },
+  "FLOCK": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "Screening unavailable right now."
+  },
+  "KTA": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "Screening unavailable right now."
+  },
+  "ARB": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "Screening unavailable right now."
+  },
+  "CRV": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "Screening unavailable right now."
+  },
+  "SKR": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "The project 'Seeker' is not a well-defined or widely recognized entity, and insufficient public documentation exists to determine its primary utility."
+  },
+  "JASMY": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "Screening unavailable right now."
+  },
+  "NOICE": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "Screening unavailable right now."
+  }
+}

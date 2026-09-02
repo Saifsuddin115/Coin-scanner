@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="{{ url_for('static', filename='contract.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='TC.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<style>
+
+/* ── Variables ───────────────────────────────────────────── */
+:root {
+    --bg: #0a0e17;
+    --surface: #131a2c;
+    --surface-border: #2a3349;
+    --gold: #c9a227;
+    --gold-bright: #e0c158;
+    --text: #ece7da;
+    --text-muted: #8891a8;
+    --valid: #3f8f6f;
+    --invalid: #804439;
+}
+
+/* ── Base ────────────────────────────────────────────────── */
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    padding: 0 8px;
+    box-sizing: border-box;
+}
+
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    width: 250px;
+    height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--surface-border);
+    padding-top: 80px;
+    z-index: 1000;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateX(0);
+}
+
+#sidebar.open {
+    transform: translateX(260px);
+}
+
+#menuBtn {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    z-index: 1001;
+    align-self: center;
+}
+
+#sidebar button {
+    display: block;
+    width: 60%;
+    margin: 7px auto;
+}
+
+#backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 999;
+}
+
+#backdrop.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+button {
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--gold);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 14px;
+    width: 120px;
+    margin: 8px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.3s ease, box-shadow 0.5s ease;
+    align-self: center;
+}
+
+button:hover {
+    transform: translateY(-5px);
+    color: var(--gold-bright);
+    box-shadow: 0 0 14px rgba(185, 163, 108, 0.35);
+}
+
+#Title {
+    max-width: 480px;
+    margin: 10px auto;
+    padding: 22px 24px;
+    border-top: 1px solid var(--surface-border);
+    border-bottom: 1px solid var(--surface-border);
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 25px;
+    line-height: 1.6;
+    color: var(--gold);
+}
+
+h1 {
+    max-width: 240px;
+    margin: 10px auto 4px;
+    padding: 10px 24px 0;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 1.6;
+    color: var(--gold);
+}
+
+/* ── Refresh button + last-updated row ──────────────────── */
+#controls {
+    max-width: 420px;
+    margin: 0 auto 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+#refreshBtn {
+    width: auto;
+    margin: 0;
+    padding: 8px 18px;
+    font-size: 14px;
+}
+
+#lastUpdated {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* ── Coin list ───────────────────────────────────────────── */
+#gainers-list {
+    max-width: 1000px;
+    margin: 14px auto 40px;
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+#gainers-list {
+    max-width: 1000px;
+    margin: 14px auto 40px;
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    border-radius: 16px;
+}
+
+.coin-card:first-child {
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}
+
+.coin-card:last-child {
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+}
+
+.coin-card:hover {
+    background: rgba(201, 162, 39, 0.05);
+}
+
+.coin-rank {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 14px;
+    width: 20px;
+    flex-shrink: 0;
+}
+
+.coin-info {
+    flex: 1;
+    min-width: 0;
+    padding-left: 6px;
+}
+
+.coin-info .symbol {
+    margin: 0;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.coin-info .name {
+    margin: 3px 0 0;
+    color: var(--text-muted);
+    font-size: 11.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.coin-info .volume {
+    margin: 3px 0 0;
+    color: var(--gold);
+    font-size: 11.5px;
+    font-weight: 600;
+}
+
+.coin-price {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.coin-price .price {
+    color: var(--text);
+    font-size: 14.5px;
+    font-family: 'Inter', sans-serif;
+}
+
+.coin-price .change {
+    margin-top: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.change.positive {
+    color: var(--valid);
+    background: rgba(63, 143, 111, 0.14);
+}
+
+.change.negative {
+    color: var(--invalid);
+    background: rgba(128, 68, 57, 0.14);
+}
+
+#gainers-list .empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 20px;
+}
+.status-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    margin-left: 6px;
+}
+
+.status-halal {
+    background: #3f8f6f
+}
+
+.status-haram {
+    background: #d9534f;
+}
+
+.status-unclear {
+    background: #8a8a8a;
+}
+.status-dot {
+    position: relative;
+}
+.status-dot::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: -9px;
+    left: 110%;
+    margin-left: 20px;
+  
+
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 11px;
+    font-family: 'Inter', sans-serif;
+    white-space: normal;
+    width: 400px;
+    text-align: left;
+    line-height: 1.45;
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.55);
+}
+
+.status-dot:hover::after {
+    opacity: 1;
+}
+.sparkline { margin-top: 6px; display: flex; justify-content: flex-end; }
+
+.coin-card { transition: transform 0.1s ease-out; }
+
+</style>
+</head>
+
+<script src="{{ url_for('static', filename='Contract.js') }}"></script>
+<script src="{{ url_for('static', filename='Nav.js') }}"></script>
+
+<body>
+
+<button id="menuBtn">☰</button>
+
+<div id="Title">Coin Scanner</div>
+
+<div id="backdrop"></div>
+
+<nav id="sidebar">
+    <button data-nav-key="checker" data-href="/">Trade Checker</button>
+    <button data-nav-key="journal" data-href="/calendar">Trade Journal</button>
+    <button data-nav-key="scanner" data-href="/index">Coin Scanner</button>
+    <button data-nav-key="chart" data-href="/chart">TradingView</button>
+    <button data-nav-key="contract" data-href="/contract">Daily Contract</button>
+</nav>
+
+
+<h1>Top Gainers</h1>
+
+<div id="controls">
+    <button id="refreshBtn">Refresh</button>
+    <span id="lastUpdated"></span>
+</div>
+
+<div id="gainers-list"></div>
+
+<script>
+
+function formatVolume(vol) {
+    if (vol >= 1_000_000) return "$" + (vol / 1_000_000).toFixed(1) + "M";
+    if (vol >= 1_000) return "$" + (vol / 1_000).toFixed(1) + "K";
+    return "$" + vol;
+}
+
+function buildSparklineSVG(closes) {
+    if (!closes || closes.length < 2) return '';
+    const w = 80, h = 28;
+    const min = Math.min(...closes);
+    const max = Math.max(...closes);
+    const range = max - min || 1;
+    const trendUp = closes[closes.length - 1] >= closes[0];
+    const color = trendUp ? 'var(--valid)' : 'var(--invalid)';
+
+    const points = closes.map((price, i) => {
+        const x = (i / (closes.length - 1)) * w;
+        const y = h - ((price - min) / range) * h;
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+        <polyline points="${points}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+    </svg>`;
+}
+
+async function loadSparkline(symbol) {
+    try {
+        const res = await fetch(`/api/sparkline/${symbol}`);
+        const data = await res.json();
+        const el = document.getElementById(`spark-${symbol}`);
+        if (el) el.innerHTML = buildSparklineSVG(data.closes);
+    } catch (e) {
+        console.log('Sparkline error:', symbol, e);
+    }
+}
+
+
+function renderCoins(data) {
+    const container = document.getElementById("gainers-list");
+    container.innerHTML = "";
+
+    if (!data || data.length === 0) {
+        container.innerHTML = `<div class="empty-state">No data available right now.</div>`;
+        return;
+    }
+
+    data.forEach((coin, index) => {
+        const isPositive = coin.change_24h >= 0;
+        const changeClass = isPositive ? "positive" : "negative";
+        const changeSign = isPositive ? "+" : "";
+
+        const item = document.createElement("a");
+        item.className = "coin-card";
+        item.href = `https://www.tradingview.com/chart/?symbol=COINBASE:${coin.symbol}USD`;
+        item.target = "_blank";
+        item.rel = "noopener noreferrer";
+        
+        let statusClass = "status-unclear";
+
+if (coin.halal_status.status === "halal") {
+    statusClass = "status-halal";
+}
+else if (coin.halal_status.status === "haram") {
+    statusClass = "status-haram";
+}
+
+        item.innerHTML = `
+            <div class="coin-rank">${index + 1}</div>
+            <div class="coin-info">
+                <p class="symbol">
+    ${coin.symbol}
+    <span class="status-dot ${statusClass}" data-tooltip="${coin.halal_status.status.toUpperCase()}: ${coin.halal_status.reason}"></span>
+</p>
+                <p class="name">${coin.name}</p>
+                ${coin.volume_24h !== undefined
+                    ? `<p class="volume">Vol ${formatVolume(coin.volume_24h)}</p>`
+                    : ""}
+            </div>
+           <div class="coin-price">
+    <div class="price">$${coin.price}</div>
+    <div class="change ${changeClass}">${changeSign}${coin.change_24h}%</div>
+    <div class="sparkline" id="spark-${coin.symbol}"></div>
+</div>
+        `;
+
+        container.appendChild(item);
+    });
+    data.forEach(coin => loadSparkline(coin.symbol));
+}
+
+function updateTimestamp() {
+    const now = new Date();
+    document.getElementById("lastUpdated").textContent =
+        "Updated " + now.toLocaleTimeString();
+}
+
+async function loadGainers() {
+    try {
+        const response = await fetch("/api/gainers");
+        const data = await response.json();
+        renderCoins(data);
+        updateTimestamp();
+    } catch (error) {
+        console.log("Error loading gainers:", error);
+    }
+}
+
+// Manual refresh button
+document.getElementById("refreshBtn").addEventListener("click", loadGainers);
+
+// Initial load
+loadGainers();
+
+// Auto-refresh every 5 minutes
+setInterval(loadGainers, 300000);
+
+// ── Sidebar ───────────────────────────────────────────────
+const menuBtn = document.getElementById('menuBtn');
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('backdrop');
+
+function openSidebar()  { sidebar.classList.add('open');    backdrop.classList.add('open'); }
+function closeSidebar() { sidebar.classList.remove('open'); backdrop.classList.remove('open'); }
+
+menuBtn.addEventListener('click', () => {
+    sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+});
+backdrop.addEventListener('click', closeSidebar);
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSidebar();
+});
+function initTilt(containerSelector, itemSelector, options = {}) {
+    const { max = 8, scale = 1.02 } = options;
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+
+    container.addEventListener('mousemove', (e) => {
+        const card = e.target.closest(itemSelector);
+        if (!card) return;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * -max;
+        const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * max;
+        card.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${scale})`;
+    });
+
+    container.addEventListener('mouseout', (e) => {
+        const card = e.target.closest(itemSelector);
+        if (!card) return;
+        if (e.relatedTarget && card.contains(e.relatedTarget)) return;
+        card.style.transform = '';
+    });
+}
+initTilt('#gainers-list', '.coin-card');
+
+</script>
+
+</body>
+</html>

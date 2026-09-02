@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="en">    
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='contract.css') }}">
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='TC.png') }}">
+<link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+        <style>
+          
+
+
+
+      #instructions {
+    max-width: 480px;
+    margin: 40px auto 30px;
+    padding: 22px 24px;
+    border-top: 1px solid var(--surface-border);
+    border-bottom: 1px solid var(--surface-border);
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    transform: translateY(-65px);
+} 
+
+.eyebrow {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    margin-bottom: 12px;
+}
+:root {
+    --bg: #0a0e17;          /* ink navy, near-black */
+    --surface: #131a2c;     /* card background */
+    --surface-border: #2a3349; /* hairline border on cards */
+    --gold: #c9a227;        /* brass/champagne, less saturated than goldenrod */
+    --gold-bright: #e0c158; /* hover state */
+    --text: #ece7da;        /* warm ivory, NOT grey */
+    --text-muted: #8891a8;  /* slate, for secondary text */
+    --valid: #3f8f6f;       /* muted jade, not neon green */
+    --invalid: #804439;     /* oxblood, not neon red */
+    --scrim-gold: rgba(40, 32, 10, 0.93);   /* warm gold-tinted dark scrim, for valid */
+--scrim-error: rgba(8, 10, 16, 0.97); /* muted oxblood scrim, toned way down from #2a0a0a */
+}
+
+
+    
+
+body {
+    background: 
+        radial-gradient(ellipse 800px 500px at 50% -10%, rgba(201, 162, 39, 0.06), transparent 60%),
+        var(--bg);
+    background-size: 200% 200%;
+    animation: bgDrift 25s ease-in-out infinite;
+      color: var(--text);
+    font-family: 'Inter', sans-serif;
+}
+@keyframes bgDrift {
+    0%, 100% { background-position: 0% 0%; }
+    50% { background-position: 20% 10%; }
+}
+
+
+button {
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--gold);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 14px;
+    width: 120px;
+    margin: 8px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.3s ease, box-shadow 0.5s ease;
+    align-self: center;
+}
+
+button:hover {
+    transform: translateY(-5px);
+    color: var(--gold-bright);
+    box-shadow: 0 0 14px rgba(185, 163, 108, 0.35);
+}
+
+.border-draw {
+    position: absolute;
+    inset: -2px;
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    pointer-events: none;
+}
+
+.border-draw path {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 2;
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+button:hover .border-draw path {
+    stroke-dashoffset: 0;
+}
+
+h2,h3,h4,h5,h6,h7 {
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: var(--gold);
+     font-family: 'Playfair Display', serif;
+}
+#question1,
+#questionBreakout,
+#Breakout,
+#breakoutBPR,
+#questionLTF,
+#question2,
+#question3,
+#question4,
+#tradeButtons,
+#confluences {
+    padding: 20px;
+    font-family: 'Playfair Display', serif;
+    color: var(--gold);
+    width: min(590px, 90vw);
+    margin: 15px auto;
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    text-align: center;
+    transform: translateY(-100px);
+}
+
+#question1.fade-out,
+#questionBreakout.fade-out,
+#Breakout.fade-out,
+#breakoutBPR.fade-out,
+#questionLTF.fade-out,
+#question2.fade-out,
+#question3.fade-out,
+#question4.fade-out,
+#tradeButtons.fade-out,
+#confluences.fade-out {
+
+    opacity: 0;
+
+    transform: translateY(-100px);
+
+    transition:
+        opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+
+.next-btn {
+    display: block;
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.next-btn:Hover{
+    transform: translateY(-5px);
+}
+
+button:active {
+
+    transform: scale(0.97);
+
+}
+
+#verdictOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 10;
+    animation: fadeIn 0.3s ease;
+}
+
+#verdictValid {
+    color: var(--gold-bright);
+    background: var(--surface);
+    border: 1px solid var(--gold);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(201, 162, 39, 0.18);
+    padding: 56px 40px;   /* was 40px — more top/bottom space */
+    border-radius: 20px;
+    text-align: center;
+    font-family: inherit;
+    max-width: 480px;
+    width: min(480px, 90vw);
+    min-height: 320px;    /* optional: guarantees a floor even with short text */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#verdictValid .verdict-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+#verdictValid .verdict-body {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+#verdictFomo, #verdictLimit, #verdictInvalid, #verdictBearish, #verdictBreakoutWait, #verdictHyperNo {
+    color: #c97a6c;
+    background: var(--surface);
+    border: 1px solid var(--invalid);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(156, 74, 60, 0.18);
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 32px;
+    font-weight: bold;
+    font-family: inherit;
+    
+}
+
+
+
+#resetButton{
+    display: block;
+    margin: 0 auto;
+    transform: translateY(-80px);
+}
+#resetButton:hover{
+    transform: translateY(-87px);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+
+}
+
+
+@keyframes fadeIn {
+
+from {
+    opacity: 0;
+}
+
+to {
+    opacity: 1;
+}
+
+}
+
+
+
+.confluence-list {
+    text-align: left;
+    max-width: 480px;
+    margin: 16px auto 0;
+  
+}
+
+.confluence-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 6px;
+    
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    cursor: pointer;
+     border-bottom: 1px solid rgba(201, 162, 39, 0.35);
+}
+
+.confluence-row:last-of-type {
+    border-bottom: none;
+}
+
+.confluence-row:hover {
+    background: rgba(185, 163, 108, 0.06);
+}
+
+.confluence-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.confluence-name input[type="checkbox"] {
+    accent-color: var(--gold);
+    width: 16px;
+    height: 16px;
+}
+
+.confluence-weight {
+    font-family: monospace;
+    font-size: 13px;
+    color: var(--gold);
+}
+.confluence-row:Hover{
+    transform:translateY(-3px);
+    background: rgba(201, 162, 39, 0.06);
+    box-shadow: inset 0 0 0 1px rgba(201, 162, 39, 0.15);
+
+}
+
+#result,
+#indecision,
+#trades,
+#Setup,
+#FOMO,
+#LTFresult,
+#BreakoutResult,
+#breakoutExistsResult,
+#breakoutHighResult,
+#breakoutBPRResult {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+
+    transition:
+        max-height 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.4s ease;
+}
+
+#result.show,
+#indecision.show,
+#trades.show,
+#Setup.show,
+#FOMO.show,
+#LTFresult.show,
+#BreakoutResult.show,
+#breakoutExistsResult.show,
+#breakoutHighResult.show,
+#breakoutBPRResult.show {
+    opacity: 1;
+}
+
+dialog#confirmModal {
+    color: var(--gold-bright);
+    background: var(--surface);
+    border: 1px solid var(--gold);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(201, 162, 39, 0.18);
+    padding: 60px;
+    border-radius: 20px;
+    text-align: center;
+    font-family: inherit;
+    max-width: 500px;
+    font-size: 16px;
+}
+dialog#confirmModal[open] {
+    animation: fadeIn 0.3s ease;
+}
+dialog#confirmModal::backdrop {
+    background: var(--scrim-error);
+}
+dialog#confirmModal h2 {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 24px;
+    font-family: inherit;
+}
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px;
+
+    width: 250px;
+    height: 100vh;
+
+    background: var(--surface);
+    border-right: 1px solid var(--surface-border);
+
+    padding-top: 80px;
+    z-index: 1000;
+
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateX(0);
+}
+
+#sidebar.open {
+    transform: translateX(260px);
+}
+
+
+#menuBtn{
+   align-self:center;
+   
+
+    width:60px;
+    height:60px;
+
+    font-size:24px;
+
+    z-index:1001;
+}
+#sidebar button{
+
+    display:block;
+
+    width:60%;
+
+    margin:7px auto;
+
+}
+#backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(6px);
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+
+    z-index: 999;
+}
+
+#backdrop.open {
+    opacity: 1;
+    pointer-events: all;
+}
+.modal-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+h2{
+    margin-bottom: 55px;
+}
+
+        </style>
+
+
+
+
+    </head>
+
+<button id="menuBtn">☰</button>
+
+<script src="{{ url_for('static', filename='Contract.js') }}"></script>
+<script src="{{ url_for('static', filename='Nav.js') }}"></script>
+
+
+    <body>
+<div id="backdrop"></div>
+
+<div id="instructions">
+    <span class="eyebrow">THE RULE</span>
+    This is a step-by-step process to become profitable. No emotions, simply follow this and it will lead you to the path of profitability.
+</div>
+
+<nav id="sidebar">
+    <button data-nav-key="checker" data-href="/">Trade Checker</button>
+    <button data-nav-key="journal" data-href="/calendar">Trade Journal</button>
+    <button data-nav-key="scanner" data-href="/index">Coin Scanner</button>
+    <button data-nav-key="chart" data-href="/chart">TradingView</button>
+    <button data-nav-key="contract" data-href="/contract">Daily Contract</button>
+</nav>
+
+<br>
+<br>
+<form>
+
+
+
+
+
+
+<div id="question1">
+
+
+    <h2>Setup</h2>
+ What is the trend on higher timeframe of the setup you are choosing?
+<p> 
+<button type="button" onclick="checksetup('HyperBull')">Hyper Bullish (Parabolic) <svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+<button type="button" onclick="checksetup('Bull')">Bullish (Higher highs) <svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+<button type="button" onclick="checksetup('Consolidation')">Consolidation (Sideways) <svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+<button type="button" onclick="checksetup('Bearish')">Bearish (Lower lows) <svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+<p id="Setup"></p>
+<button type="button" id="next1" class="next-btn" style="display:none" onclick="goToSetupNext()">Next<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+</div>
+
+<!-- BREAKOUT GATE: decides whether we take the Breakout/BPR path
+     or fall through to the normal LTF / indecision / FOMO logic -->
+
+<div id="questionBreakout" style="display:none">
+    <h2>BREAKOUT CHECK</h2>
+Is there actually a BREAKOUT on this setup? A 15 min candle has to CLOSE ABOVE the high.
+<p>
+<button type="button" onclick="checkBreakoutExists('Yes')">Yes<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+<button type="button" onclick="checkBreakoutExists('No')">No<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+<p id="breakoutExistsResult"></p>
+<button type="button" id="nextBreakoutExists" class="next-btn" style="display:none" onclick="goToBreakoutExistsNext()">Next<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+</div>
+
+<!-- BREAKOUT PATH -->
+
+<div id="Breakout" style="display:none">
+
+    <h2>BREAKOUT CONFIRMATION</h2>
+
+    <span id="breakoutQuestionText">Did a bullish candle CLOSE above a higher-timeframe high?</span>
+
+    <br><br>
+
+    <strong id="breakoutSubText">
+        Only an Hourly timeframe or higher counts.
+        A wick through the high does NOT count.
+    </strong>
+
+    <p>
+
+        <button
+            type="button"
+            onclick="checkBreakoutHigh('Yes')">
+
+            Yes
+
+            <svg
+                class="border-draw"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none">
+
+                <path
+                    d="M50,100 L100,100 L100,0 L50,0"
+                    vector-effect="non-scaling-stroke" />
+
+                <path
+                    d="M50,100 L0,100 L0,0 L50,0"
+                    vector-effect="non-scaling-stroke" />
+
+            </svg>
+
+        </button>
+
+
+        <button
+            type="button"
+            onclick="checkBreakoutHigh('No')">
+
+            No / wick only
+
+            <svg
+                class="border-draw"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none">
+
+                <path
+                    d="M50,100 L100,100 L100,0 L50,0"
+                    vector-effect="non-scaling-stroke" />
+
+                <path
+                    d="M50,100 L0,100 L0,0 L50,0"
+                    vector-effect="non-scaling-stroke" />
+
+            </svg>
+
+        </button>
+
+    </p>
+
+    <p id="breakoutHighResult"></p>
+
+    <button
+        type="button"
+        id="nextBreakoutBPR"
+        class="next-btn"
+        style="display:none"
+        onclick="goToNext('Breakout', 'breakoutBPR')">
+
+        Next
+
+        <svg
+            class="border-draw"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none">
+
+            <path
+                d="M50,100 L100,100 L100,0 L50,0"
+                vector-effect="non-scaling-stroke" />
+
+            <path
+                d="M50,100 L0,100 L0,0 L50,0"
+                vector-effect="non-scaling-stroke" />
+
+        </svg>
+
+    </button>
+
+</div>
+
+
+
+<div id="breakoutBPR" style="display:none">
+
+    <h2>BPR CONFIRMATION</h2>
+
+    Is there a BPR to the left of your current entry? Meaning an zone of insane sell off, only bearish candles on the 4hr/D tf?
+
+    <p>
+
+        <button
+            type="button"
+            onclick="checkBreakoutBPR('Yes')">
+
+            Yes
+
+            <svg
+                class="border-draw"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none">
+
+                <path
+                    d="M50,100 L100,100 L100,0 L50,0"
+                    vector-effect="non-scaling-stroke" />
+
+                <path
+                    d="M50,100 L0,100 L0,0 L50,0"
+                    vector-effect="non-scaling-stroke" />
+
+            </svg>
+
+        </button>
+
+
+        <button
+            type="button"
+            onclick="checkBreakoutBPR('No')">
+
+            No
+
+            <svg
+                class="border-draw"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none">
+
+                <path
+                    d="M50,100 L100,100 L100,0 L50,0"
+                    vector-effect="non-scaling-stroke" />
+
+                <path
+                    d="M50,100 L0,100 L0,0 L50,0"
+                    vector-effect="non-scaling-stroke" />
+
+            </svg>
+
+        </button>
+
+    </p>
+
+    <p id="breakoutBPRResult"></p>
+
+</div>
+
+
+<div id="questionLTF" style="display:none">
+    <h2>LOWER TF</h2>
+Right now, on the timeframe you're actually entering on — is structure bullish or has it broken against your bias (Breaker Block)?
+<p>
+<button type="button" onclick="checkLTF('Bull')">Bullish (agrees) <svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+<button type="button" onclick="checkLTF('Bearish')">Bearish (broke against me) <svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+<p id="LTFresult"></p>
+<button type="button" id="nextLTF" class="next-btn" style="display:none" onclick="goToNext('questionLTF', 'question2')">Next<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+</div>
+
+
+
+<div id="question2" style="display:none">
+    <h3>INDECISION</h3>
+Is there a high TF DOJI (In a bull trend), indecision (Long wicks), or a bearish engulfing?
+<p> 
+<button type="button" onclick="checkreversal('Yes')">Yes<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+<button type="button" onclick="checkreversal('No')">No<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+<p id="indecision"></p>
+<button type="button" id="next2" class="next-btn" style="display:none" onclick="goToNext('question2', 'question3')">Next<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+</div>
+
+
+<div id="question3" style="display:none">
+    <h5>FOMO</h5>
+You KNOW if you are lying to yourself, use confluences continuation does not count nor does break of high. Is this a FOMO trade?
+<p>
+<button type="button" onclick="FOMO('FOMO')">Yes<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+<button type="button" onclick="FOMO('Not FOMO')">No<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+<br>
+<p id="FOMO"></p>
+</p>
+</div>
+
+
+
+
+    <div id="tradeButtons" style="display:none">
+        <h6>DAILY TRADES</h6>
+<button type="button" onclick="trades('0')">0<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+
+<button type="button" onclick="trades('1')">1<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+
+<button type="button" onclick="trades('2')">2<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+
+<button type="button" onclick="trades('3')">3<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+
+<button type="button" id="hide" class="next-btn" style="display:none" onclick="goToNext('tradeButtons', 'confluences')">Next<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+</div>
+<p id="trades"></p>
+
+
+
+<div id="confluences" style="display:none">
+<h7>ENTER CONFLUENCES:</h7>
+<div class="confluence-list">
+  <label class="confluence-row">
+    <span class="confluence-name"><input type="checkbox" id="DailyOB" value="9"> Daily OB</span>
+    <span class="confluence-weight">9.0</span>
+  </label>
+  <label class="confluence-row">
+    <span class="confluence-name"><input type="checkbox" id="DailyFVG" value="7"> Daily FVG</span>
+    <span class="confluence-weight">7.0</span>
+  </label>
+  <label class="confluence-row">
+    <span class="confluence-name"><input type="checkbox" id="4HOB" value="8"> 4H OB</span>
+    <span class="confluence-weight">8.0</span>
+  </label>
+  <label class="confluence-row">
+    <span class="confluence-name"><input type="checkbox" id="4HFVG" value="6"> 4H FVG</span>
+    <span class="confluence-weight">6.0</span>
+  </label>
+  <label class="confluence-row">
+    <span class="confluence-name"><input type="checkbox" id="1HOB" value="7"> 1H OB</span>
+    <span class="confluence-weight">7.0</span>
+  </label>
+  <label class="confluence-row">
+    <span class="confluence-name"><input type="checkbox" id="1HFVG" value="5.0"> 1H FVG</span>
+    <span class="confluence-weight">5.0</span>
+  </label>
+  <label class="confluence-row">
+    <span class="confluence-name"><input type="checkbox" id="15MOB" value="6"> 15M OB</span>
+    <span class="confluence-weight">6.0</span>
+  </label>
+  <label class="confluence-row">
+    <span class="confluence-name"><input type="checkbox" id="15MFVG" value="4"> 15M FVG</span>
+    <span class="confluence-weight">4.0</span>
+  </label>
+  <label class="confluence-row">
+    <span class="confluence-name"><input type="checkbox" id="5MOB" value="5"> 5M OB</span>
+    <span class="confluence-weight">5.0</span>
+  </label>
+   <label class="confluence-row">
+    <span class="confluence-name"><input type="checkbox" id="5MFVG" value="4"> 5M FVG</span>
+    <span class="confluence-weight">4.0</span>
+  </label>
+  <label class="confluence-row">
+    <span class="confluence-name"><input type="checkbox" id="Hourly Liq sweep" value="4"> Hourly Liq sweep</span>
+    <span class="confluence-weight">4.0</span>
+  </label>
+  <label class="confluence-row">
+    <span class="confluence-name"><input type="checkbox" id="15M Liq sweep" value="4"> 15M Liq sweep</span>
+    <span class="confluence-weight">4.0</span>
+  </label>
+  
+</div>
+<p>
+<button type="button" onclick="submitForm()">Submit<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+</p>
+</div>
+<dialog id="confirmModal">
+    <h2>Take a deep breath, wait 5 seconds and ask yourself:
+        <br>
+        <br>
+         -Is this an A+ setup?
+         <br>
+         <br>
+         -Am i taking this trade because i want to be a part of it or because it's actually valid?
+         <br>
+         <br>
+         -If you lose this trade what do you think the reason would be? 
+         <br>
+         <br>
+    
+         Remember, it is more important to protect you're capital then to increse you're capital. One bad trade can wipe out weeks of worth :/
+    
+    </h2>
+    <button type="button" id="modalYes" class="modal-btn">Yes</button>
+    <button type="button" id="modalNo" class="modal-btn">No</button>
+</dialog>
+
+<div id="verdictOverlay">
+<div id="verdictValid" style="display:none">
+    <div class="verdict-title">VALID SETUP ✅</div>
+    <div class="verdict-body">
+        Rules you are REQUIRED to follow:<br><br>
+        <br>
+        - Do NOT move SL or TP<br>
+        <br>
+        <br>
+        <br>
+        <br>
+        You are not using the TC, the TC is using you. If you do not follow these rules, you'll ask why you didn't follow them.
+    </div>
+</div>
+<div id="verdictFomo" style="display:none">⚠ SETUP INVALID<br><br>FOMO detected;</div>
+<div id="verdictLimit" style="display:none">⚠  SETUP INVALID<br><br>Daily trade limit reached;</div>
+<div id="verdictInvalid" style="display:none">⚠ SETUP INVALID<br><br>Not enough confluences;</div>
+<div id="verdictBearish" style="display:none">⚠ SETUP INVALID<br><br>Bearish trend detected;</div>
+<div id="verdictBreakoutWait" style="display:none">⚠ NOT CONFIRMED<br><br>No full close above the high yet — wait for confirmation, don't chase the wick;</div>
+<div id="verdictHyperNo" style="display:none">⚠ DO NOT TAKE THIS TRADE<br><br>Save your capital;</div>
+
+<button id="verdictActionBtn" onclick="location.reload()">
+        Continue
+        <svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg>
+    </button>
+   
+</div>
+
+<br>
+<br>
+<br>
+<button type="button" id="resetButton" style="display:none" onclick="location.reload()">
+    Reset<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg>
+</button>
+</form>
+
+
+
+
+
+
+    </body>
+</html>
+
+<script>
+let lastSetupChoice = null;
+let breakoutExistsChoice = null;
+
+    const TC_EXTENSION_ID = "iaobjcihlmogcnmejlkacaohoadmlejh"; // same ID as in your extension
+
+function showContinueToCoinbase() {
+    const btn = document.getElementById('verdictActionBtn');
+    btn.childNodes[0].nodeValue = 'Continue to Coinbase '; // leaves the svg border alone
+    btn.onclick = function() {
+        const params = new URLSearchParams(window.location.search);
+        const returnUrl = params.get('return') || 'https://www.coinbase.com/advanced-trade';
+
+        if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+            chrome.runtime.sendMessage(TC_EXTENSION_ID, { action: 'unlock', returnUrl: returnUrl }, function(response) {
+                console.log('TC Gatekeeper:', response);
+            });
+        } else {
+            window.location.href = returnUrl;
+        }
+    };
+}
+
+function showBreakoutValid() {
+
+    const overlay =
+        document.getElementById('verdictOverlay');
+
+
+    overlay.style.background =
+        'var(--scrim-gold)';
+
+
+    document.getElementById('verdictValid').style.display =
+        'block';
+
+
+    overlay.style.display =
+        'flex';
+
+
+    showContinueToCoinbase();
+}
+
+function showBreakoutInvalid() {
+
+    const overlay =
+        document.getElementById('verdictOverlay');
+
+
+    overlay.style.background =
+        'var(--scrim-error)';
+
+
+    document.getElementById('verdictInvalid').style.display =
+        'block';
+
+
+    overlay.style.display =
+        'flex';
+
+
+    const button =
+        document.getElementById('verdictActionBtn');
+
+
+    button.childNodes[0].nodeValue =
+        'Reset ';
+
+
+    button.onclick =
+        function() {
+
+            location.reload();
+
+        };
+}
+
+        document.addEventListener('DOMContentLoaded', () => {
+    delayButtons('question1');
+});
+
+function showResetButton() {
+
+    document.getElementById('resetButton').style.display = 'block';
+
+}
+
+const menuBtn = document.getElementById('menuBtn');
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('backdrop');
+
+function openSidebar() {
+    sidebar.classList.add('open');
+    backdrop.classList.add('open');
+}
+
+function closeSidebar() {
+    sidebar.classList.remove('open');
+    backdrop.classList.remove('open');
+}
+
+menuBtn.addEventListener('click', () => {
+    if (sidebar.classList.contains('open')) {
+        closeSidebar();
+    } else {
+        openSidebar();
+    }
+});
+
+backdrop.addEventListener('click', closeSidebar);
+
+// optional: ESC key closes it
+document.addEventListener('keydown', (e) => {
+    if (e.key === "Escape") {
+        closeSidebar();
+    }
+});
+
+function disableButtons(containerId)
+{
+    let buttons = document.querySelectorAll(`#${containerId} button:not(.next-btn)`)
+
+    buttons.forEach(button =>
+    {
+        button.disabled = true;
+    });
+}
+
+function disableCheckboxes(containerId)
+{
+    let boxes = document.querySelectorAll(`#${containerId} input`);
+
+    boxes.forEach(box =>
+    {
+        box.disabled = true;
+    });
+}
+
+function revealText(element) {
+    element.classList.add('show');
+    element.style.maxHeight = element.scrollHeight + 'px';
+}
+// Set your own delay (in ms) per card here. 1000ms = 1 second.
+const cardDelays = {
+
+    question1: 2000,
+
+    questionBreakout: 3000,
+
+    Breakout: 5000,
+
+    breakoutBPR: 5000,
+
+    questionLTF: 4000,
+
+    question2: 10000,
+
+    question3: 7000,
+
+    question4: 2000
+
+};
+const NEXT_DELAY = 6000; // time to actually read what you wrote before Next appears
+
+function showNextButton(nextBtnId, containerId, delay = NEXT_DELAY) {
+    setTimeout(() => {
+        document.getElementById(nextBtnId).style.display = 'block';
+        disableButtons(containerId);
+    }, delay);
+}
+
+function delayButtons(containerId, ms) {
+    if (ms === undefined) ms = cardDelays[containerId] ?? 1000; // default to 1s if not specified
+
+    const container = document.getElementById(containerId);
+    const buttons = container.querySelectorAll('button:not(.next-btn)');
+
+    buttons.forEach(btn => {
+        btn.style.visibility = 'hidden'; // keeps layout, just invisible
+        btn.disabled = true;
+    });
+
+    setTimeout(() => {
+        buttons.forEach(btn => {
+            btn.style.visibility = 'visible';
+            btn.disabled = false;
+        });
+    }, ms);
+}
+function goToNext(currentId, nextId, onSwap) {
+    let current = document.getElementById(currentId);
+    let next = document.getElementById(nextId);
+
+    current.classList.add('fade-out');
+
+    setTimeout(function() {
+        current.style.display = 'none';
+        current.classList.remove('fade-out');
+
+        if (typeof onSwap === 'function') {
+            onSwap();
+        }
+
+        next.style.transition = 'none';
+        next.style.opacity = '0';
+        next.style.transform = 'translateY(-100px)';
+        next.style.display = 'block';
+
+        next.offsetHeight;
+
+        next.style.transition = 'opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
+        next.style.opacity = '1';
+        next.style.transform = 'translateY(-100px)';
+
+        delayButtons(nextId); // 👈 new line — locks the new card's buttons using its configured delay
+    }, 350);
+}
+
+
+
+
+//Starting off our choices
+function checksetup(choice) {
+
+    lastSetupChoice = choice;
+
+
+    if (choice === 'HyperBull') {
+
+        document.getElementById('Setup').innerHTML =
+            'Hyper-bullish (parabolic) trend detected. IDEAL conditions, keep the chart close!';
+
+        revealText(
+            document.getElementById('Setup')
+        );
+
+
+        showNextButton(
+            'next1',
+            'question1'
+        );
+
+
+    } else if (choice === 'Bull') {
+
+        document.getElementById('Setup').innerHTML =
+            'Bullish trend detected. Check whether price has broken and properly closed above a higher-timeframe high. Aim for the closest high.';
+
+        revealText(
+            document.getElementById('Setup')
+        );
+
+
+        showNextButton(
+            'next1',
+            'question1'
+        );
+
+
+    } else if (choice === 'Consolidation') {
+
+        document.getElementById('Setup').innerHTML =
+            'Consolidation detected. Watch for a confirmed breakout. A wick through a high is not enough — the breakout must close above it on the Hourly timeframe or higher.';
+
+        revealText(
+            document.getElementById('Setup')
+        );
+
+
+        showNextButton(
+            'next1',
+            'question1'
+        );
+
+
+    } else if (choice === 'Bearish') {
+
+        document.getElementById('verdictOverlay').style.background =
+            'var(--scrim-error)';
+
+
+        document.getElementById('verdictBearish').style.display =
+            'block';
+
+
+        document.getElementById('verdictOverlay').style.display =
+            'flex';
+
+
+        disableButtons('question1');
+
+        return;
+    }
+
+
+    disableButtons('question1');
+}
+
+function goToSetupNext() {
+
+    if (
+        lastSetupChoice === 'Bull' ||
+        lastSetupChoice === 'Consolidation' ||
+        lastSetupChoice === 'HyperBull'
+    ) {
+
+        // Every non-bearish trend now passes through the breakout gate first.
+        goToNext('question1', 'questionBreakout');
+
+    } else {
+
+        goToNext('question1', 'questionLTF');
+
+    }
+
+    disableButtons('question1');
+}
+
+// THE GATE: is there actually a breakout on this setup or not.
+// Yes -> Breakout/BPR confirmation path.
+// No  -> falls through to the normal LTF / indecision / FOMO logic.
+function checkBreakoutExists(choice) {
+
+    breakoutExistsChoice = choice;
+
+    const result =
+        document.getElementById('breakoutExistsResult');
+
+
+    if (choice === 'Yes') {
+
+        result.innerHTML =
+            'Breakout noted — moving to breakout route.';
+
+    } else {
+
+        result.innerHTML =
+            'Proceed to confluence route.';
+    }
+
+    revealText(result);
+
+
+    disableButtons('questionBreakout');
+
+
+    showNextButton(
+        'nextBreakoutExists',
+        'questionBreakout'
+    );
+}
+
+function goToBreakoutExistsNext() {
+
+    if (breakoutExistsChoice === 'Yes') {
+
+        goToNext('questionBreakout', 'Breakout', setupBreakoutCard);
+
+    } else {
+
+        goToNext('questionBreakout', 'questionLTF');
+    }
+}
+
+// Configures the Breakout card's question/warning text and clears any
+// leftover result text, based on which Setup choice got us here.
+// Called as the onSwap callback when questionBreakout -> Breakout.
+function setupBreakoutCard() {
+
+    const qText = document.getElementById('breakoutQuestionText');
+    const subText = document.getElementById('breakoutSubText');
+    const result = document.getElementById('breakoutHighResult');
+
+    if (lastSetupChoice === 'HyperBull') {
+
+        qText.innerHTML =
+            'Did a bullish candle CLOSE above a high on the 15 MINUTE timeframe?';
+
+        subText.innerHTML =
+            'A wick through the high does NOT count. If you count a wick here, YOU WILL LOSE.';
+
+    } else if (lastSetupChoice === 'Bull') {
+
+        qText.innerHTML =
+            'Did a bullish candle CLOSE above a high on the 15 minute timeframe?';
+
+        subText.innerHTML =
+            'A wick through the high does NOT count.';
+
+    } else {
+
+        // Consolidation (and any fallback) keeps the original higher-timeframe rule
+        qText.innerHTML =
+            'Did a bullish candle CLOSE above a higher-timeframe high?';
+
+        subText.innerHTML =
+            'Only an Hourly timeframe or higher counts. A wick through the high does NOT count.';
+    }
+
+    result.innerHTML = '';
+    result.classList.remove('show');
+    result.style.maxHeight = '0';
+}
+
+function checkBreakoutHigh(choice) {
+
+    const result =
+        document.getElementById('breakoutHighResult');
+
+
+    if (choice === 'Yes') {
+
+        if (lastSetupChoice === 'HyperBull') {
+
+            result.innerHTML =
+                'Continue — however if you are lying to yourself for dopamine, you will regret it.';
+
+        } else if (lastSetupChoice === 'Bull') {
+
+            result.innerHTML =
+                '15-minute breakout confirmed. Now check for BPR.';
+
+        } else {
+
+            result.innerHTML =
+                'Higher-timeframe breakout confirmed. Price closed above the high on the Hourly timeframe or higher. Now check for BPR.';
+        }
+
+        revealText(result);
+
+
+        disableButtons('Breakout');
+
+
+        showNextButton(
+            'nextBreakoutBPR',
+            'Breakout'
+        );
+
+    } else {
+
+        if (lastSetupChoice === 'HyperBull') {
+
+            document.getElementById('verdictOverlay').style.background =
+                'var(--scrim-error)';
+
+
+            document.getElementById('verdictHyperNo').style.display =
+                'block';
+
+
+            document.getElementById('verdictOverlay').style.display =
+                'flex';
+
+
+            disableButtons('Breakout');
+
+            return;
+        }
+
+        document.getElementById('verdictOverlay').style.background =
+            'var(--scrim-error)';
+
+
+        document.getElementById('verdictBreakoutWait').style.display =
+            'block';
+
+
+        document.getElementById('verdictOverlay').style.display =
+            'flex';
+
+
+        disableButtons('Breakout');
+
+        return;
+    }
+}
+
+
+
+function checkBreakoutBPR(choice) {
+
+    const result =
+        document.getElementById('breakoutBPRResult');
+
+
+    if (lastSetupChoice === 'Consolidation') {
+
+        // Original behavior: no BPR invalidates the whole breakout
+        if (choice === 'Yes') {
+
+            result.innerHTML =
+                'Aim for the highest high, OR aim for hourly highs and re enter after a retrace! ';
+
+            revealText(result);
+
+
+            disableButtons('breakoutBPR');
+
+
+            setTimeout(() => {
+
+                showBreakoutValid();
+
+            }, NEXT_DELAY);
+
+
+        } else {
+
+            result.innerHTML =
+                'No BPR is present to the left. Aim for the NEXT HIGH!';
+
+            revealText(result);
+
+
+            disableButtons('breakoutBPR');
+
+
+            setTimeout(() => {
+
+                showBreakoutInvalid();
+
+            }, NEXT_DELAY);
+        }
+
+        return;
+    }
+
+    // Bull and HyperBull: the breakout already happened, BPR only changes the target
+    if (choice === 'Yes') {
+
+        if (lastSetupChoice === 'HyperBull') {
+
+            result.innerHTML =
+                'BPR confirmed. Aim for the high on the higher timeframe.';
+
+        } else {
+
+            result.innerHTML =
+                'BPR confirmed. Aim for the highest high.';
+        }
+
+    } else {
+
+        result.innerHTML =
+            'No BPR present. Aim for the NEXT HIGH!';
+    }
+
+    revealText(result);
+
+
+    disableButtons('breakoutBPR');
+
+
+    setTimeout(() => {
+
+        showBreakoutValid();
+
+    }, NEXT_DELAY);
+}
+
+
+function checkLTF(choice) {
+    if (choice === 'Bull') {
+        document.getElementById('LTFresult').innerHTML = 'Structure agrees, no break against you. Aim for the body of the candle at a high.';
+        revealText(document.getElementById('LTFresult'));
+    } else {
+        document.getElementById('LTFresult').innerHTML = 'Structure broke against your bias. Unless it has clearly reclaimed, aim for the nearest wick only — this is not a full-target trade.';
+        revealText(document.getElementById('LTFresult'));
+    }
+    disableButtons("questionLTF");
+    showNextButton('nextLTF', 'questionLTF');
+}
+
+function checkreversal(choice) {
+    if (choice === 'Yes') {
+        document.getElementById('indecision').innerHTML = 'Dojis mean indecision which means anything can happen, usually the next candle is the decisive candle, avoid trading these unless hyper bullish. If there is a bearish engulfing you NEED to close the. chart and walk away.';
+        revealText(document.getElementById('indecision'));
+    } else {
+        document.getElementById('indecision').innerHTML = 'Proceed; A reminder to mark out everything you come across for mental and visual clarity.';
+        revealText(document.getElementById('indecision'));
+    }
+    disableButtons("question2");
+      showNextButton('next2', 'question2');
+}
+
+function FOMO(choices) {
+    if (choices === 'FOMO') {
+        document.getElementById('verdictOverlay').style.background = 'var(--scrim-error)';
+        document.getElementById('verdictFomo').style.display = 'block';
+        document.getElementById('verdictOverlay').style.display = 'flex';
+        setTimeout(function() {
+            disableButtons("question4");
+        }, 300);
+        return;
+    } else {
+        goToNext('question3', 'tradeButtons', function() {
+            disableButtons("question3");
+        });
+    }
+}
+
+function trades(numbers){
+    if (numbers === '0' || numbers === '1' || numbers === '2') {
+        showNextButton('hide', 'tradeButtons', 200);
+        
+    } else if (numbers === '3') {
+        document.getElementById('verdictLimit').style.display = 'block';
+        document.getElementById('verdictOverlay').style.background = 'var(--scrim-error)';
+        document.getElementById('verdictOverlay').style.display = 'flex';
+        setTimeout(function() {
+            disableButtons("tradeButtons");
+        }, 300);
+    }
+}
+function submitForm() {
+    var checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    var totalValue = 0;
+    checkboxes.forEach(function(checkbox) {
+        totalValue += parseFloat(checkbox.value);
+    });
+
+    if (totalValue > 12) {
+        document.getElementById('confirmModal').showModal();
+
+        // disable both buttons while the modal is up
+        const yesBtn = document.getElementById('modalYes');
+        const noBtn = document.getElementById('modalNo');
+        yesBtn.disabled = true;
+        noBtn.disabled = true;
+
+        setTimeout(() => {
+            yesBtn.disabled = false;
+            noBtn.disabled = false;
+        }, 4000); // 4 seconds
+    } else {
+        document.getElementById('verdictOverlay').style.background = 'var(--scrim-error)';
+        document.getElementById('verdictInvalid').style.display = 'block';
+        document.getElementById('verdictOverlay').style.display = 'flex';
+        disableCheckboxes("confluences");
+    
+    }
+}
+
+document.getElementById('modalYes').addEventListener('click', function() {
+    // save confluences so calendar can read them
+    const checked = document.querySelectorAll('#confluences input[type="checkbox"]:checked');
+    const names = [];
+    checked.forEach(cb => {
+        const nameSpan = cb.closest('.confluence-name');
+        if (nameSpan) names.push(nameSpan.textContent.trim());
+    });
+    localStorage.setItem('lastTradeConfluences', JSON.stringify(names));
+
+    document.getElementById('confirmModal').close();
+    document.getElementById('verdictOverlay').style.background = 'var(--scrim-gold)';
+    document.getElementById('verdictValid').style.display = 'block';
+    document.getElementById('verdictOverlay').style.display = 'flex';
+    disableCheckboxes("confluences");
+    showContinueToCoinbase();
+});
+
+document.getElementById('modalNo').addEventListener('click', function() {
+    document.getElementById('confirmModal').close();
+
+
+    let checkboxes = document.querySelectorAll('#confluences input[type="checkbox"]');
+    checkboxes.forEach(function(checkbox) {
+        checkbox.checked = false;
+    });
+});
+
+
+
+
+</script>
