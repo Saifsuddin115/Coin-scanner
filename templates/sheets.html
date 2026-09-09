@@ -531,7 +531,51 @@ nav {
     padding: 10px 0 50px;
     overflow-x: hidden;   /* moved here from body */
 }
+dialog#deleteConfirmModal {
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(128, 68, 57, 0.18);
+    padding: 32px;
+    border-radius: 16px;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    max-width: 380px;
+    width: 90vw;
 
+}
+dialog#deleteConfirmModal[open] {
+    animation: fadeIn 0.3s ease;
+}
+dialog#deleteConfirmModal::backdrop {
+    background: rgba(8, 10, 16, 0.92);
+    backdrop-filter: blur(4px);
+}
+dialog#deleteConfirmModal h3 {
+    color: var(--gold);
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    margin: 0 0 60px;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom:20px;
+}
+.modal-buttons button {
+    width: auto;
+    padding: 17px 40px;
+    margin: 0;
+}
+.danger-btn {
+    color: var(--gold) !important;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
 
     </style>
 
@@ -550,7 +594,7 @@ nav {
         <button data-nav-key="scanner" data-href="/index">Coin Scanner</button>
         <button data-nav-key="chart" data-href="/chart">TradingView</button>
         <button data-nav-key="contract" data-href="/contract">Daily Contract</button>
-        <button data-nav-key="sheets" data-href="/journal"> TradeJournal</button>
+        <button data-nav-key="sheets" data-href="/journal"> Trade Journal</button>
     </nav>
 
     <script src="{{ url_for('static', filename='Contract.js') }}"></script>
@@ -765,7 +809,14 @@ nav {
                 </div>
 
             </form>
-
+<dialog id="deleteConfirmModal">
+    <h3>Delete this trade?</h3>
+    
+    <div class="modal-buttons">
+        <button type="button" id="confirmDeleteYes" class="danger-btn">Delete</button>
+        <button type="button" id="confirmDeleteNo">Cancel</button>
+    </div>
+</dialog>
         </section>
 
     </main>
@@ -1286,16 +1337,29 @@ document.addEventListener("click", e => {
     showTradeList();
 });
 
-       deleteTradeBtn.addEventListener("click", async function () {
-    if (!editingTradeId) return;
-    const confirmed = confirm(`Delete this trade? This cannot be undone.`);
-    if (!confirmed) return;
+        const deleteConfirmModal = document.getElementById("deleteConfirmModal");
+        const confirmDeleteYes = document.getElementById("confirmDeleteYes");
+        const confirmDeleteNo = document.getElementById("confirmDeleteNo");
 
-    await fetch(`/api/trades/${editingTradeId}`, { method: "DELETE" });
-    editingTradeId = null;
-    await loadTrades();
-    showTradeList();
-});
+        deleteTradeBtn.addEventListener("click", function () {
+            if (!editingTradeId) return;
+            deleteConfirmModal.showModal();
+        });
+
+        confirmDeleteNo.addEventListener("click", () => {
+            deleteConfirmModal.close();
+        });
+
+        confirmDeleteYes.addEventListener("click", async () => {
+            deleteConfirmModal.close();
+            if (!editingTradeId) return;
+
+            await fetch(`/api/trades/${editingTradeId}`, { method: "DELETE" });
+            editingTradeId = null;
+            await loadTrades();
+            showTradeList();
+        });
+
 
         /* ========================= BUTTONS / FILTERS ========================= */
         currentPage = 1;
