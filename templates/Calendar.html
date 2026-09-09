@@ -160,7 +160,7 @@ h1 {
 #monthlyPnl {
     text-align: center;
     margin: 0 auto 14px;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Inter', sans-serif;
     letter-spacing: 1px;
 }
 
@@ -609,10 +609,11 @@ dialog#dayModal textarea:focus {
 
 <nav id="sidebar">
     <button data-nav-key="checker" data-href="/">Trade Checker</button>
-    <button data-nav-key="journal" data-href="/calendar">Trade Journal</button>
+    <button data-nav-key="journal" data-href="/calendar">Calendar</button>
     <button data-nav-key="scanner" data-href="/index">Coin Scanner</button>
     <button data-nav-key="chart" data-href="/chart">TradingView</button>
     <button data-nav-key="contract" data-href="/contract">Daily Contract</button>
+    <button data-nav-key="sheets" data-href="/journal"> Trade Journal</button>
 </nav>
 
 
@@ -636,7 +637,7 @@ dialog#dayModal textarea:focus {
         <div class="streak-box">
             <span class="streak-label">All Time Best</span>
               <div class="streak-row">
-                <span class="streak-num" id="winStreakBestNum">4</span>
+                <span class="streak-num" id="winStreakBestNum">0</span>
            <svg class="streak-fire" viewBox="0 0 24 24">
     <path d="M12 2c-1.5 4-5 5.5-5 10a5 5 0 0 0 10 0c0-1.2-.8-2.2-1.3-3.3 2.4 1.2 3.8 3.6 3.8 6.3a6.5 6.5 0 0 1-13 0c0-5.8 4.3-7.2 5.5-13z" fill="url(#fireGrad)"/>
     <path d="M12 9c-.6 2-2 2.6-2 4.6a2.4 2.4 0 0 0 4.8 0c0-.7-.4-1-.6-1.5.9.5 1.4 1.4 1.4 2.3a2.8 2.8 0 0 1-5.6 0c0-2.5 1.6-3.3 2-5.4z" fill="#0a0e17" opacity="0.55"/>
@@ -858,30 +859,18 @@ function updateMonthLabel() {
         currentYear === START_YEAR && currentMonth === START_MONTH;
 }
 
-function previousMonth() {
-
-    if (currentYear === START_YEAR && currentMonth === START_MONTH)
-        return;
-
+async function previousMonth() {
+    if (currentYear === START_YEAR && currentMonth === START_MONTH) return;
     currentMonth--;
-
-    if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
-    }
-    migrateAllDays()
+    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    await loadMonthTrades();
     renderCalendar();
 }
 
-function nextMonth() {
-
+async function nextMonth() {
     currentMonth++;
-
-    if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-    }
-
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    await loadMonthTrades();
     renderCalendar();
 }
 
@@ -899,20 +888,77 @@ function storageKey(day) {
     return `journal-${currentYear}-${currentMonth}-${day}`;
 }
 
-function loadDay(day) {
 
-    const raw = localStorage.getItem(storageKey(day));
-
-    return raw ? JSON.parse(raw) : null;
+async function apiGetTrades(year, month) {
+    const res = await fetch(`/api/trades?year=${year}&month=${month + 1}`);
+    return res.json();
+}
+async function apiSaveTrade(trade) {
+    const url = trade.id ? `/api/trades/${trade.id}` : `/api/trades`;
+    const res = await fetch(url, {
+        method: trade.id ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(trade)
+    });
+    return res.json();
 }
 
-function saveDay(day, data) {
 
-    localStorage.setItem(
-        storageKey(day),
-        JSON.stringify(data)
-    );
+let monthTradesCache = {}; // { dayNumber: [apiTrade, ...] }
 
+async function loadMonthTrades() {
+    monthTradesCache = {};
+    const apiTrades = await apiGetTrades(currentYear, currentMonth);
+  apiTrades.forEach(t => {
+    const day = parseInt(t.date.split('-')[2], 10);   // fixed
+    if (!monthTradesCache[day]) monthTradesCache[day] = [];
+    monthTradesCache[day].push(t);
+});
+}
+function loadDay(day) {
+    const dayTrades = monthTradesCache[day] || [];
+    if (!dayTrades.length) return null;
+
+    const scored = dayTrades.filter(t => t.pnl != null);
+
+    let multiplier = 1;
+    scored.forEach(t => { multiplier *= (1 + t.pnl / 100); });
+
+    return {
+        trades: dayTrades.map(t => ({
+            id: t.id,
+            pnl: t.pnl,
+            followedRules: t.rules_followed,
+            confluences: t.confluences || []
+        })),
+        pnl: scored.length ? parseFloat(((multiplier - 1) * 100).toFixed(2)) : null,
+        notes: dayTrades[0]?.notes || ""
+    };
+}
+async function saveDayToApi(day, data) {
+    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+    const existingIds = (monthTradesCache[day] || []).map(t => t.id);
+    const keptIds = [];
+
+    for (let i = 0; i < data.trades.length; i++) {
+        const t = data.trades[i];
+        const saved = await apiSaveTrade({
+            id: t.id,
+            date: dateStr,
+            pnl: t.pnl,
+            rules_followed: t.followedRules,
+            confluences: t.confluences,
+            notes: i === 0 ? data.notes : ""
+        });
+        keptIds.push(saved.id);
+    }
+
+    const removedIds = existingIds.filter(id => !keptIds.includes(id));
+    for (const id of removedIds) {
+        await fetch(`/api/trades/${id}`, { method: "DELETE" });
+    }
+
+    await loadMonthTrades();
 }
 
 // ── Monthly P&L ───────────────────────────────────────────
@@ -1015,6 +1061,7 @@ function addTradeRow(trade = {}) {
     const confluences = trade.confluences || [];
 
     const wrap = document.createElement('div');
+    if (trade.id) wrap.dataset.tradeId = trade.id;
     wrap.classList.add('trade-row-full');
 
     wrap.innerHTML = `
@@ -1150,34 +1197,21 @@ function migrateAllDays() {
     }
 }
 
-function getAllTradesSorted() {
-    const dayEntries = [];
-    for (const key in localStorage) {
-        const m = key.match(/^journal-(\d+)-(\d+)-(\d+)$/);
-        if (!m) continue;
-        const [, y, mo, d] = m.map(Number);
-        let data;
-        try { data = JSON.parse(localStorage.getItem(key)); } catch (e) { continue; }
-        if (!data.trades?.length) continue;
-        dayEntries.push({ date: new Date(y, mo, d), trades: data.trades });
-    }
-    dayEntries.sort((a, b) => a.date - b.date);
-    return dayEntries.flatMap(e => e.trades);
-}
+async function computeStreaksFromApi() {
+    const res = await fetch("/api/trades");
+    const allTrades = await res.json();
+    allTrades.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-function computeStreaks() {
-    const trades = getAllTradesSorted();
     let winStreak = 0, ruleStreak = 0;
-    let winBest = parseInt(localStorage.getItem('winStreakBest') || '4', 10);
+    let winBest = parseInt(localStorage.getItem('winStreakBest') || '0', 10);
     let ruleBest = parseInt(localStorage.getItem('ruleStreakBest') || '0', 10);
 
-    trades.forEach(t => {
-        winStreak = t.pnl > 0 ? winStreak + 1 : 0;
+    allTrades.forEach(t => {
+         if (t.pnl == null) return; // no result logged yet — doesn't count toward streaks
+    winStreak = t.pnl > 0 ? winStreak + 1 : 0;
         if (winStreak > winBest) winBest = winStreak;
-
-        if (t.followedRules === true) ruleStreak += 1;
-        else if (t.followedRules === false) ruleStreak = 0;
-
+        if (t.rules_followed === true) ruleStreak += 1;
+        else if (t.rules_followed === false) ruleStreak = 0;
         if (ruleStreak > ruleBest) ruleBest = ruleStreak;
     });
 
@@ -1186,14 +1220,13 @@ function computeStreaks() {
     return { winStreak, winBest, ruleStreak, ruleBest };
 }
 
-function renderStreaks() {
-    const { winStreak, winBest, ruleStreak, ruleBest } = computeStreaks();
+async function renderStreaks() {
+    const { winStreak, winBest, ruleStreak, ruleBest } = await computeStreaksFromApi();
     document.getElementById('winStreakNum').textContent = winStreak;
     document.getElementById('winStreakBestNum').textContent = winBest;
     document.getElementById('ruleStreakNum').textContent = ruleStreak;
     document.getElementById('ruleStreakBestNum').textContent = ruleBest;
 }
-
 
 let activeDay = null;
 
@@ -1265,44 +1298,42 @@ function openDay(day) {
     modal.showModal();
 
 }
-migrateAllDays();
-renderCalendar();
+(async function init() {
+    await loadMonthTrades();
+    renderCalendar();
+    await renderStreaks();
+})();
 // ── Modal buttons ─────────────────────────────────────────
 
 document.getElementById("addTradeRow").addEventListener("click", () => {
     addTradeRow();
 });
+document.getElementById("closeDay").addEventListener("click", () => {
+    modal.close();
+});
 
-document.getElementById("saveDay").addEventListener("click", () => {
+// saveDay listener stays, just delete the nested block that was inside it:
+document.getElementById("saveDay").addEventListener("click", async () => {
+    const rows = document.querySelectorAll('.trade-row-full');
+    const trades = [];
 
-// Inside the saveDay click handler — replace the total calculation
-const rows = document.querySelectorAll('.trade-row-full');
-const trades = [];
-let multiplier = 1;
-
-rows.forEach(wrap => {
-    const val = parseFloat(wrap.querySelector('.trade-pnl').value);
-    if (isNaN(val)) return;
-    multiplier *= (1 + val / 100);
-    trades.push({
-        pnl: val,
-        followedRules: wrap.dataset.followedRules === '' ? null : wrap.dataset.followedRules === 'true',
-        confluences: [...wrap._confluences]
+    rows.forEach(wrap => {
+        const val = parseFloat(wrap.querySelector('.trade-pnl').value);
+        if (isNaN(val)) return;
+        trades.push({
+            id: wrap.dataset.tradeId ? Number(wrap.dataset.tradeId) : undefined,
+            pnl: val,
+            followedRules: wrap.dataset.followedRules === '' ? null : wrap.dataset.followedRules === 'true',
+            confluences: [...wrap._confluences]
+        });
     });
-});
 
-const total = (multiplier - 1) * 100;
-const notes = document.getElementById("inputNotes").value;
+    const notes = document.getElementById("inputNotes").value;
 
-saveDay(activeDay, {
-    trades,
-    pnl: trades.length ? parseFloat(total.toFixed(2)) : null,
-    notes
-});
-
-renderCalendar();
-renderStreaks();
-modal.close();
+    await saveDayToApi(activeDay, { trades, notes });
+    renderCalendar();
+    await renderStreaks();
+    modal.close();
 });
 
 initTilt('#calendar', '.day:not(.empty)');

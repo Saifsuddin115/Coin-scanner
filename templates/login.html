@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TC Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='contract.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+:root {
+    --bg: #0a0e17;
+    --surface: #131a2c;
+    --surface-border: #2a3349;
+    --gold: #c9a227;
+    --gold-bright: #e0c158;
+    --text: #ece7da;
+    --text-muted: #8891a8;
+    --valid: #3f8f6f;
+    --invalid: #804439;
+}
+
+/* ── Base ────────────────────────────────────────────────── */
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    padding: 0 8px;
+    box-sizing: border-box;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-title {
+    max-width: 480px;
+    margin: 0 0 30px;
+    padding: 22px 24px;
+    border-top: 1px solid var(--surface-border);
+    border-bottom: 1px solid var(--surface-border);
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+button {
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--gold);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 8px;
+    width: 200px;
+    margin: 8px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.3s ease, box-shadow 0.5s ease;
+    align-self: center;
+}
+
+button:hover {
+    transform: translateY(-5px);
+    color: var(--gold-bright);
+    box-shadow: 0 0 14px rgba(185, 163, 108, 0.35);
+}
+
+input {
+    box-sizing: border-box;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--gold);
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    width: 200px;
+    margin: 8px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.15);
+}
+
+    </style>
+
+</head>
+<body>
+    <form method="POST" action="/login">
+        <div class="login-title">TC Login</div>
+        <br>
+        <br>
+        <input type="password" name="password" placeholder="Password" required autofocus>
+        <button type="submit">Enter</button>
+    </form>
+</body>
+</html>

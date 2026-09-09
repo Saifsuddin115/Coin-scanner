@@ -40,7 +40,7 @@
             position: fixed;
             top: 10px;
             left: 10px;
-            width: 46px;
+            width: 70px;
             height: 46px;
             font-size: 20px;
             z-index: 1001;
@@ -141,11 +141,13 @@
 
 <nav id="sidebar">
     <button data-nav-key="checker" data-href="/">Trade Checker</button>
-    <button data-nav-key="journal" data-href="/calendar">Trade Journal</button>
+    <button data-nav-key="journal" data-href="/calendar">Calendar</button>
     <button data-nav-key="scanner" data-href="/index">Coin Scanner</button>
     <button data-nav-key="chart" data-href="/chart">TradingView</button>
     <button data-nav-key="contract" data-href="/contract">Daily Contract</button>
+    <button data-nav-key="sheets" data-href="/journal"> Trade Journal</button>
 </nav>
+
 
 <div id="Title">TradingView</div>
 
@@ -154,6 +156,14 @@
     <div id="tv_chart_container"></div>
 </div>
 
+<script>
+    // Wipe any cached TradingView widget settings (background,
+    // grid, scale colors) before the widget initializes, so it
+    // can't reload a stale gradient/grid state over our overrides.
+    Object.keys(localStorage)
+        .filter(key => key.toLowerCase().includes('tradingview') || key.toLowerCase().includes('chart'))
+        .forEach(key => localStorage.removeItem(key));
+</script>
 
 <script
     type="text/javascript"
@@ -165,38 +175,46 @@
 new TradingView.widget({
 
     autosize: true,
-
     symbol: "COINBASE:BTCUSD",
-
     interval: "60",
-
     timezone: "Etc/UTC",
-
-    theme: "dark",
-
+    theme: "light",
     style: "1",
-
     locale: "en",
-
-    toolbar_bg: "#131a2c",
-
+    toolbar_bg: "#808080",
     enable_publishing: false,
-
     hide_side_toolbar: false,
-
     allow_symbol_change: true,
-
     details: true,
-
     hotlist: true,
-
     calendar: true,
-
     withdateranges: true,
+    container_id: "tv_chart_container",
 
-    container_id: "tv_chart_container"
+    disabled_features: ["use_localstorage_for_settings"],
+
+    overrides: {
+        "mainSeriesProperties.candleStyle.upColor": "#2962FF",
+        "mainSeriesProperties.candleStyle.downColor": "#000000",
+        "mainSeriesProperties.candleStyle.borderUpColor": "#2962FF",
+        "mainSeriesProperties.candleStyle.borderDownColor": "#000000",
+        "mainSeriesProperties.candleStyle.wickUpColor": "#2962FF",
+        "mainSeriesProperties.candleStyle.wickDownColor": "#000000",
+
+        "paneProperties.background": "#808080",
+        "paneProperties.backgroundType": "solid",
+
+        "paneProperties.vertGridProperties.color": "rgba(0,0,0,0)",
+        "paneProperties.horzGridProperties.color": "rgba(0,0,0,0)",
+
+        "scalesProperties.backgroundColor": "#808080",
+        "scalesProperties.textColor": "#ece7da",
+        "scalesProperties.lineColor": "#2a3349"
+    }
 
 });
+
+</script>
 
 </script>
 

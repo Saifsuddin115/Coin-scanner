@@ -648,5 +648,225 @@
     "status": "unclear",
     "confidence score": 0,
     "reason": "Screening unavailable right now."
+  },
+  "DASH": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "DASH is primarily designed as a decentralized peer-to-peer digital currency for payments and value transfer, which functions as a medium of exchange."
+  },
+  "TRIA": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "TRIA is a decentralized identity and authentication infrastructure protocol that does not primarily involve interest, gambling, or leveraged derivatives."
+  },
+  "XCN": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "Onyxcoin (XCN) primarily serves as a utility token for a decentralized cloud infrastructure and enterprise blockchain ecosystem, which does not inherently violate Sharia principles."
+  },
+  "ZEN": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Horizen is a privacy-focused blockchain infrastructure project intended for data security and sidechain scalability, which does not inherently violate Sharia principles."
+  },
+  "DIEM": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Diem was designed as a global stablecoin payment network for transactions and remittances, which does not inherently violate Sharia principles."
+  },
+  "NEAR": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "NEAR Protocol is a layer-one blockchain platform designed for decentralized application development, which serves as general-purpose infrastructure rather than being inherently tied to prohibited financial activities."
+  },
+  "ZEC": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Zcash is a privacy-focused cryptocurrency designed as a medium of exchange and store of value, which does not fall into the prohibited categories of interest, gambling, or speculation-based utility."
+  },
+  "LRDS": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Blocklords is a strategy-based blockchain game where tokens serve as in-game assets and utility rather than interest-bearing instruments or gambling mechanisms."
+  },
+  "PRO": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Propy's primary utility is the tokenization and facilitation of real estate transactions, which represents a tangible, asset-backed economic activity."
+  },
+  "ELSA": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "There is insufficient public information regarding the specific utility or whitepaper of the project 'Elsa' to determine its primary purpose."
+  },
+  "RNBW": {
+    "status": "unclear",
+    "confidence score": 0,
+    "reason": "The project 'Rainbow' is a common name used by multiple disparate blockchain initiatives, and there is insufficient verifiable information regarding its primary utility to determine compliance."
+  },
+  "NOM": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Nomina is a decentralized identity and naming protocol, which functions as a utility for blockchain address management rather than engaging in prohibited financial activities."
+  },
+  "ASTER": {
+    "status": "unclear",
+    "confidence score": 0.5,
+    "reason": "There is insufficient public information regarding the specific utility or whitepaper of a project named 'Aster' to determine its primary purpose."
+  },
+  "CAKE": {
+    "status": "unclear",
+    "confidence score": 0.7,
+    "reason": "While it functions as a decentralized exchange, its primary utility includes liquidity mining and yield farming mechanisms that frequently involve interest-based returns."
+  },
+  "PERP": {
+    "status": "haram",
+    "confidence score": 1,
+    "reason": "The primary utility of Perpetual Protocol is the facilitation of decentralized perpetual futures and leveraged derivatives trading."
+  },
+  "WELL": {
+    "status": "haram",
+    "confidence score": 0.95,
+    "reason": "Moonwell is a decentralized lending and borrowing protocol that functions primarily through interest-based transactions (Riba)."
+  },
+  "SIGN": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Sign is a decentralized identity and attestation protocol focused on verifiable data, which does not involve interest, gambling, or prohibited financial derivatives."
+  },
+  "RAY": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "Raydium functions primarily as an automated market maker (AMM) and decentralized exchange (DEX) for liquidity provision and token swapping, which are permissible activities in Islamic finance."
+  },
+  "PYR": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "Vulcan Forged is primarily a blockchain-based gaming ecosystem where the utility token is used for in-game asset purchases and marketplace transactions, rather than speculative financial services."
+  },
+  "DRB": {
+    "status": "haram",
+    "confidence score": 0.9,
+    "reason": "The project's primary purpose revolves around debt relief, which in a financial context typically involves interest-based lending or debt restructuring protocols."
+  },
+  "JUPITER": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Jupiter is a decentralized exchange aggregator providing utility for token swaps and liquidity management, which does not inherently involve prohibited activities like interest-based lending or gambling."
+  },
+  "LAYER": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "Solayer acts as a restaking infrastructure protocol on Solana, focusing on network security and decentralized validator services rather than interest-based lending or prohibited financial derivatives."
+  },
+  "METIS": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Metis is a Layer 2 scaling solution for Ethereum focused on infrastructure and decentralized autonomous organizations, which does not inherently involve prohibited financial activities."
+  },
+  "ZK": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "ZKsync is a layer-2 scaling solution designed to improve Ethereum's transaction efficiency and scalability, which serves a valid utility without inherently involving forbidden financial activities."
+  },
+  "ROSE": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Oasis Network is a privacy-focused layer-1 blockchain platform designed for scalable and confidential decentralized applications, which serves as a technological utility rather than a financial instrument of interest, gambling, or speculation."
+  },
+  "GRT": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "The Graph functions as a decentralized indexing protocol for blockchain data, which provides utility as digital infrastructure rather than financial speculation or usury."
+  },
+  "ORCA": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Orca is a decentralized exchange (DEX) focused on automated market making and liquidity provision, which functions as a platform for permissible asset trading."
+  },
+  "MLN": {
+    "status": "halal",
+    "confidence score": 0.85,
+    "reason": "Enzyme is a decentralized asset management protocol that focuses on vault-based portfolio management and on-chain investment strategies rather than interest-based lending or gambling."
+  },
+  "FIDA": {
+    "status": "halal",
+    "confidence score": 90,
+    "reason": "Bonfida serves as a decentralized infrastructure provider for the Solana ecosystem, focusing on naming services and dashboard utilities rather than interest, gambling, or leveraged products."
+  },
+  "TIA": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Celestia is a modular data availability network designed for infrastructure scaling, which does not involve interest, gambling, or speculative derivatives."
+  },
+  "TAO": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Bittensor functions as a decentralized protocol for artificial intelligence model training and machine intelligence, which aligns with utility-based innovation rather than prohibited financial activities."
+  },
+  "RLS": {
+    "status": "halal",
+    "confidence score": 90,
+    "reason": "Rayls is an infrastructure platform designed for institutional asset tokenization and secure interoperability, which supports legitimate economic utility rather than prohibited financial activities."
+  },
+  "LINK": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Chainlink is a decentralized oracle network that provides real-world data to smart contracts, which serves as essential infrastructure for utility rather than interest-based or gambling services."
+  },
+  "PNG": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Pangolin is a decentralized exchange (DEX) that facilitates peer-to-peer token swapping and liquidity provision, which functions as a digital marketplace without inherent interest-based lending or gambling mechanisms."
+  },
+  "DOT": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Polkadot functions as a scalable, interoperable blockchain infrastructure layer that facilitates decentralized applications rather than centering its utility on prohibited financial activities."
+  },
+  "ATOM": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Cosmos (ATOM) serves as an interoperability infrastructure for blockchain communication and does not inherently facilitate interest-based lending, gambling, or prohibited derivatives."
+  },
+  "VET": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "Vechain is a supply chain management and enterprise blockchain platform focused on logistical transparency and data integrity rather than interest-based finance or gambling."
+  },
+  "BLAST": {
+    "status": "haram",
+    "confidence score": 0.9,
+    "reason": "The project functions primarily as a yield-bearing layer-2 network that incentivizes liquidity through interest-like returns on native assets, which constitutes Riba (usury)."
+  },
+  "ETC": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Ethereum Classic functions primarily as a decentralized smart contract platform and programmable blockchain network, which does not inherently involve interest, gambling, or prohibited derivative speculation."
+  },
+  "VTHO": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "VeThor Token serves as the utility gas token for the VeChainThor blockchain to facilitate smart contract execution and network transactions, which is a permissible economic activity."
+  },
+  "QI": {
+    "status": "haram",
+    "confidence score": 1,
+    "reason": "The primary utility of BENQI is a decentralized liquidity market protocol specifically designed for interest-bearing lending and borrowing."
+  },
+  "AKT": {
+    "status": "halal",
+    "confidence score": 0.95,
+    "reason": "Akash Network is a decentralized cloud computing marketplace that provides tangible utility through infrastructure services without involving interest, gambling, or prohibited derivatives."
+  },
+  "EGLD": {
+    "status": "halal",
+    "confidence score": 0.9,
+    "reason": "MultiversX functions as a scalable layer-1 blockchain infrastructure designed for decentralized applications and smart contracts, which does not inherently facilitate prohibited financial activities."
+  },
+  "XPL": {
+    "status": "unclear",
+    "confidence score": 0.5,
+    "reason": "Plasma (XPL) is a generic name used by multiple projects; without a specific whitepaper or unique smart contract address, its primary utility cannot be verified."
   }
 }

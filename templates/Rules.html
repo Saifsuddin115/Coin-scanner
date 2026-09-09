@@ -461,10 +461,11 @@ h2{
 
 <nav id="sidebar">
     <button data-nav-key="checker" data-href="/">Trade Checker</button>
-    <button data-nav-key="journal" data-href="/calendar">Trade Journal</button>
+    <button data-nav-key="journal" data-href="/calendar">Calendar</button>
     <button data-nav-key="scanner" data-href="/index">Coin Scanner</button>
     <button data-nav-key="chart" data-href="/chart">TradingView</button>
     <button data-nav-key="contract" data-href="/contract">Daily Contract</button>
+    <button data-nav-key="sheets" data-href="/journal"> TradeJournal</button>
 </nav>
 
 <br>
@@ -1136,12 +1137,12 @@ function goToNext(currentId, nextId, onSwap) {
 function checksetup(choice) {
 
     lastSetupChoice = choice;
-
+showResetButton();
 
     if (choice === 'HyperBull') {
 
         document.getElementById('Setup').innerHTML =
-            'Hyper-bullish (parabolic) trend detected. IDEAL conditions, keep the chart close!';
+            'Hyper-bullish (parabolic) trend detected. IDEAL conditions, mark out zones for a future retrace as well!';
 
         revealText(
             document.getElementById('Setup')
@@ -1397,48 +1398,50 @@ function checkBreakoutBPR(choice) {
         document.getElementById('breakoutBPRResult');
 
 
-    if (lastSetupChoice === 'Consolidation') {
+    if (choice === 'Yes') {
 
-        // Original behavior: no BPR invalidates the whole breakout
-        if (choice === 'Yes') {
+        if (lastSetupChoice === 'HyperBull') {
 
             result.innerHTML =
-                'Aim for the highest high, OR aim for hourly highs and re enter after a retrace! ';
+                'BPR confirmed. Aim for the high on the higher timeframe.';
 
-            revealText(result);
+        } else if (lastSetupChoice === 'Bull') {
 
-
-            disableButtons('breakoutBPR');
-
-
-            setTimeout(() => {
-
-                showBreakoutValid();
-
-            }, NEXT_DELAY);
-
+            result.innerHTML =
+                'BPR confirmed. Aim for the highest high.';
 
         } else {
 
             result.innerHTML =
-                'No BPR is present to the left. Aim for the NEXT HIGH!';
-
-            revealText(result);
-
-
-            disableButtons('breakoutBPR');
-
-
-            setTimeout(() => {
-
-                showBreakoutInvalid();
-
-            }, NEXT_DELAY);
+                'Aim for the highest high, OR aim for hourly highs and re enter after a retrace!';
         }
 
-        return;
+    } else {
+
+        if (lastSetupChoice === 'Consolidation') {
+
+            result.innerHTML =
+                'No BPR is present to the left. Aim for the NEXT HIGH!';
+
+        } else {
+
+            result.innerHTML =
+                'No BPR present. Aim for the NEXT HIGH!';
+        }
     }
 
+    revealText(result);
+
+
+    disableButtons('breakoutBPR');
+
+
+    setTimeout(() => {
+
+        showBreakoutValid();
+
+    }, NEXT_DELAY);
+}
     // Bull and HyperBull: the breakout already happened, BPR only changes the target
     if (choice === 'Yes') {
 
@@ -1470,7 +1473,6 @@ function checkBreakoutBPR(choice) {
         showBreakoutValid();
 
     }, NEXT_DELAY);
-}
 
 
 function checkLTF(choice) {

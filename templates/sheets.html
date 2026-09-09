@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Trade Journal — TC</title>
+
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='TC.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='contract.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+
+      :root {
+    --bg: #0a0e17;
+    --surface: #131a2c;
+    --surface-2: #182137;
+    --surface-border: #2a3349;   /* was: --border */
+
+    --gold: #c9a227;
+    --gold-bright: #e0c158;
+
+    --text: #ece7da;
+    --text-muted: #8891a8;       /* was: --muted */
+
+    --valid: #3f8f6f;            /* was: --green */
+    --invalid: #804439;          /* was: --red */
+}
+
+        * { box-sizing: border-box; }
+
+     html, body {
+    
+    height: 100%;
+}
+body {
+    background: var(--bg);
+}
+
+        button, input, select, textarea { font: inherit; }
+        button { cursor: pointer; }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+
+
+        .journal-app {
+            width: min(1400px, calc(100% - 36px));
+            margin: 0 auto;
+            padding: 10px 0 50px;
+        }
+
+        /* =========================================================
+           TITLE BLOCK — same treatment as Calendar / Contract h1
+        ========================================================= */
+
+        .title-block {
+            max-width: 480px;
+            margin: 10px auto 30px;
+            padding: 20px 24px;
+            border-top: 1px solid var(--surface-border);
+            border-bottom: 1px solid var(--surface-border);
+            text-align: center;
+        }
+
+        .title-block h1 {
+            margin: 0 0 8px;
+            font-style: italic;
+            font-weight: 500;
+            font-size: 25px;
+            letter-spacing: 1px;
+            color: var(--gold);
+        }
+
+        .title-block p {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .journal-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .new-trade-btn {
+            border: 1px solid var(--gold);
+            border-radius: 10px;
+            padding: 10px 16px;
+            background: rgba(201, 162, 39, 0.10);
+            color: var(--gold-bright);
+            font-weight: 600;
+            font-size: 13px;
+            transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .new-trade-btn:hover {
+            background: rgba(201, 162, 39, 0.18);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(201, 162, 39, 0.08);
+        }
+
+        /* =========================================================
+           TOOLBAR
+        ========================================================= */
+
+        .journal-toolbar {
+            display: grid;
+            grid-template-columns: minmax(200px, 1.4fr) repeat(3, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .search-box, .filter-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--surface-border);
+            border-radius: 9px;
+            background: var(--surface);
+            color: var(--text);
+            outline: none;
+            font-size: 13px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .search-box::placeholder { color: #687289; }
+        .search-box:focus, .filter-select:focus {
+            border-color: rgba(201, 162, 39, 0.65);
+            box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.07);
+        }
+        .filter-select option { background: var(--surface); color: var(--text); }
+
+        /* =========================================================
+           TABLE
+        ========================================================= */
+
+        .table-card {
+            overflow: hidden;
+            border: 1px solid var(--surface-border);
+            border-radius: 14px;
+            background: var(--surface);
+        }
+
+        .table-wrap { width: 100%; overflow-x: auto; }
+
+        .trade-table { width: 100%; border-collapse: collapse; min-width: 1050px; }
+
+        .trade-table th {
+            padding: 12px 14px;
+            background: #10172a;
+            border-bottom: 1px solid var(--surface-border);
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            text-align: left;
+        }
+
+        .trade-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid rgba(42, 51, 73, 0.7);
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .trade-table tbody tr { cursor: pointer; transition: background 0.2s ease; }
+        .trade-table tbody tr:hover { background: rgba(255, 255, 255, 0.025); }
+        .trade-table tbody tr:last-child td { border-bottom: none; }
+
+        .coin-name { font-weight: 700; color: var(--text); }
+
+        .reason-cell, .confluence-cell {
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--text-muted);
+        }
+
+        .direction-long { color: #72bd98 !important; }
+        .direction-short { color: #c57b70 !important; }
+        .direction-conso { color:#72bd98 !important; }
+        .direction-hyperbull{ color: var(--gold) !important; font-weight: 700; }
+
+        /* wins / losses — blue / black, matching Calendar.html */
+        .pnl-positive { color: #3885e3 !important; font-weight: 700; }
+        .pnl-negative { color: #676767 !important; font-weight: 700; }
+        .pnl-neutral  { color: var(--text-muted) !important; }
+
+        .rules-yes { color: #72bd98 !important; }
+        .rules-no  { color: #c57b70 !important; }
+
+        .empty-state { padding: 60px 25px; text-align: center; }
+        .empty-state h3 { margin: 0 0 8px; color: var(--text); font-size: 22px; font-weight: 600; }
+        .empty-state p { margin: 0 0 18px; color: var(--text-muted); font-size: 13px; }
+
+        /* =========================================================
+           EDITOR
+        ========================================================= */
+
+        #tradeEditor { display: none; }
+        #tradeEditor.active { display: block; }
+        #tradeList.hidden { display: none; }
+
+        .editor-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            align-self: flex-start;
+            padding: 8px 13px;
+            border: 1px solid var(--surface-border);
+            border-radius: 9px;
+            background: var(--surface);
+            color: var(--text-muted);
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        .back-btn:hover { color: var(--text); border-color: var(--gold); }
+
+        .editor-title { text-align: center; }
+        .editor-title h2 {
+            margin: 0 0 5px;
+            font-style: italic;
+            font-weight: 500;
+            font-size: 24px;
+            letter-spacing: 1px;
+            color: var(--gold-bright);
+        }
+        .editor-title p { margin: 0; color: var(--text-muted); font-size: 12px; font-family: 'Inter', sans-serif; }
+
+        .trade-form { display: flex; flex-direction: column; gap: 10px; }
+
+        .form-card {
+            padding: 14px;
+            border: 1px solid var(--surface-border);
+            border-radius: 13px;
+            background: var(--surface);
+        }
+
+        .form-card h3 {
+            margin: 0 0 12px;
+            color: var(--gold);
+            font-size: 14px;
+            font-weight: 500;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .field { display: flex; flex-direction: column; gap: 5px; }
+        .field.full { grid-column: 1 / -1; }
+
+        .field label {
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+        }
+
+        .field input, .field select, .field textarea {
+            width: 100%;
+            border: 1px solid var(--surface-border);
+            border-radius: 8px;
+            background: #10172a;
+            color: var(--text);
+            outline: none;
+            font-size: 12.5px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+        .field input, .field select { min-height: 36px; padding: 8px 10px; }
+        .field textarea { min-height: 65px; padding: 9px 10px; resize: vertical; line-height: 1.5; }
+
+        .field input:focus, .field select:focus, .field textarea:focus {
+            border-color: rgba(201, 162, 39, 0.65);
+            box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.07);
+            background: #111a2e;
+        }
+        .field textarea::placeholder, .field input::placeholder { color: #687289; }
+
+        .toggle-pair { display: flex; gap: 8px; }
+        .toggle-btn {
+            flex: 1;
+            border: 1px solid var(--surface-border);
+            border-radius: 8px;
+            background: #10172a;
+            color: var(--text-muted);
+            padding: 8px;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        .toggle-btn.selected-yes { border-color: var(--valid); color: #72bd98; background: rgba(63,143,111,0.08); }
+        .toggle-btn.selected-no  { border-color: var(--invalid); color: #c57b70; background: rgba(128,68,57,0.08); }
+
+        .confluence-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 7px;
+        }
+
+        .confluence-item { position: relative; }
+        .confluence-item input { position: absolute; opacity: 0; pointer-events: none; }
+
+        .confluence-item label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 36px;
+            padding: 8px 9px;
+            border: 1px solid var(--surface-border);
+            border-radius: 8px;
+            background: #10172a;
+            color: var(--text-muted);
+            font-size: 11px;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+        .confluence-item label::before {
+            content: "";
+            flex: 0 0 13px;
+            width: 13px;
+            height: 13px;
+            border: 1px solid #526078;
+            border-radius: 4px;
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+        .confluence-item input:checked + label {
+            border-color: rgba(201, 162, 39, 0.65);
+            background: rgba(201, 162, 39, 0.08);
+            color: var(--gold-bright);
+        }
+        .confluence-item input:checked + label::before {
+            border-color: var(--gold);
+            background: var(--gold);
+            box-shadow: inset 0 0 0 3px #10172a;
+        }
+
+        .editor-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .action-left, .action-right { display: flex; gap: 8px; }
+
+        .action-btn { padding: 9px 14px; border-radius: 9px; font-weight: 600; font-size: 12.5px; }
+
+        .save-btn { border: 1px solid var(--gold); background: var(--gold); color: #17130a; transition: all 0.2s ease; }
+        .save-btn:hover { background: var(--gold-bright); transform: translateY(-1px); }
+
+        .cancel-btn { border: 1px solid var(--surface-border); background: var(--surface); color: var(--text-muted); }
+        .cancel-btn:hover { border-color: #4a566e; color: var(--text); }
+
+        .delete-btn { border: 1px solid rgba(128, 68, 57, 0.65); background: rgba(128, 68, 57, 0.10); color: #c57b70; }
+        .delete-btn:hover { background: rgba(128, 68, 57, 0.18); }
+
+        @media (max-width: 1100px) { .form-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+        @media (max-width: 1000px) {
+            .journal-toolbar { grid-template-columns: 1fr 1fr; }
+            .search-box { grid-column: 1 / -1; }
+            .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .confluence-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 700px) {
+            .journal-app { width: min(100% - 22px, 1400px); padding-top: 10px; }
+            .new-trade-btn { width: 100%; }
+            .journal-toolbar { grid-template-columns: 1fr; }
+            .form-grid { grid-template-columns: 1fr; }
+            .field.full { grid-column: auto; }
+            .confluence-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .editor-actions { flex-direction: column-reverse; align-items: stretch; }
+            .action-left, .action-right { width: 100%; }
+            .action-btn { flex: 1; }
+        }
+
+        @media (max-width: 450px) {
+            .confluence-grid { grid-template-columns: 1fr; }
+            .form-card { padding: 11px; }
+        }
+
+        .multiselect-wrapper { position: relative; }
+.multiselect-panel { display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+    max-height: 260px; overflow-y: auto; background: var(--surface); border: 1px solid var(--surface-border);
+    border-radius: 9px; padding: 8px; z-index: 50; }
+.multiselect-panel.open { display: block; }
+.multiselect-option { display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+    font-size: 12px; color: var(--text); cursor: pointer; border-radius: 6px; }
+.multiselect-option:hover { background: rgba(255,255,255,0.05); }
+
+#confluenceFilterTrigger {
+    margin: 0;
+    width: 100%;
+    text-align: left;
+}
+
+       /* ── Menu button ───────────────────────────────────────── */
+
+#menuBtn {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    z-index: 1001;
+    padding: 0;
+    margin: 0;
+}
+
+
+/* ── Sidebar ───────────────────────────────────────────── */
+
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 250px;
+    height: 100vh;
+
+    background: var(--surface);
+    border-right: 1px solid var(--surface-border);
+
+    padding-top: 80px;
+    box-sizing: border-box;
+
+    z-index: 1000;
+
+    /* Start hidden */
+    transform: translateX(-260px);
+
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Open sidebar */
+#sidebar.open {
+    transform: translateX(0);
+}
+
+
+/* Sidebar buttons */
+
+#sidebar button {
+    display: block;
+    width: 60%;
+    margin: 7px auto;
+}
+
+
+/* ── Backdrop ──────────────────────────────────────────── */
+
+#backdrop {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(6px);
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition: opacity 0.3s ease;
+
+    z-index: 999;
+}
+
+#backdrop.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+
+/* ── Buttons ───────────────────────────────────────────── */
+
+button {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--gold);
+
+    border: 2px solid transparent;
+    border-radius: 10px;
+
+    padding: 14px;
+
+    font-family: inherit;
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        color 0.3s ease,
+        box-shadow 0.5s ease;
+}
+
+button:hover {
+    transform: translateY(-5px);
+    color: var(--gold-bright);
+    box-shadow: 0 0 14px rgba(185, 163, 108, 0.35);
+}
+
+
+/* ── Navigation ───────────────────────────────────────── */
+
+nav {
+    display: block;
+    unicode-bidi: isolate;
+}
+
+.journal-app {
+    width: min(1400px, calc(100% - 36px));
+    margin: 0 auto;
+    padding: 10px 0 50px;
+    overflow-x: hidden;   /* moved here from body */
+}
+
+
+    </style>
+
+</head>
+
+
+<body>
+<button id="menuBtn">☰</button>
+    
+
+    <div id="backdrop"></div>
+
+    <nav id="sidebar">
+        <button data-nav-key="checker" data-href="/">Trade Checker</button>
+        <button data-nav-key="journal" data-href="/calendar">Calendar</button>
+        <button data-nav-key="scanner" data-href="/index">Coin Scanner</button>
+        <button data-nav-key="chart" data-href="/chart">TradingView</button>
+        <button data-nav-key="contract" data-href="/contract">Daily Contract</button>
+        <button data-nav-key="sheets" data-href="/journal"> TradeJournal</button>
+    </nav>
+
+    <script src="{{ url_for('static', filename='Contract.js') }}"></script>
+    <script src="{{ url_for('static', filename='Nav.js') }}"></script>
+
+    <main class="journal-app">
+
+        <section id="tradeList">
+
+            <div class="journal-header">
+                <div class="title-block">
+                    <h1>Trade Journal</h1>
+                    <p>Record, review, and learn from every trade.</p>
+                </div>
+
+                <button id="newTradeBtn" class="new-trade-btn" type="button">+ New Trade</button>
+            </div>
+
+            <div class="journal-toolbar">
+                <input id="searchInput" class="search-box" type="search" placeholder="Search coin, reason, notes, confluences..." autocomplete="off">
+
+                <select id="resultFilter" class="filter-select">
+                    <option value="all">All Results</option>
+                    <option value="win">Wins</option>
+                    <option value="loss">Losses</option>
+                    <option value="breakeven">Breakeven</option>
+                </select>
+
+                <select id="directionFilter" class="filter-select">
+                    <option value="all">All Trends</option>
+                    <option value="Hyperbull">Hyperbull</option>
+                    <option value="long">Bull</option>
+                    <option value="conso">Consolidation</option>
+                    <option value="short">Bear</option>
+                </select>
+
+          <div class="multiselect-wrapper" id="confluenceFilterWrapper">
+  <button type="button" class="filter-select" id="confluenceFilterTrigger">All Confluences</button>
+  <div class="multiselect-panel" id="confluenceFilterPanel"></div>
+</div>
+</div>
+
+            <div class="table-card">
+                <div class="table-wrap">
+                    <table class="trade-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Coin</th>
+                                <th>Trend</th>
+                                <th>Reason</th>
+                                <th>P&amp;L</th>
+                                <th>Rules</th>
+                                <th>Confluences</th>
+                                <th>Lesson</th>
+                            </tr>
+
+                            
+                        </thead>
+                        <tbody id="tradeTableBody"></tbody>
+                    </table>
+                    <div id="paginationBar" style="display:flex; justify-content:center; gap:8px; margin-top:14px;"></div>
+                </div>
+
+                <div id="emptyState" class="empty-state">
+                    <h3>No trades yet</h3>
+                    <p>Your completed trades will appear here.</p>
+                    <button id="emptyNewTradeBtn" class="new-trade-btn" type="button">+ Record Your First Trade</button>
+                </div>
+            </div>
+
+        </section>
+
+        <section id="tradeEditor">
+
+            <div class="editor-header">
+                <button id="backToListBtn" class="back-btn" type="button">← Back to Journal</button>
+
+                <div class="editor-title">
+                    <h2 id="editorHeading">New Trade</h2>
+                    <p>Document exactly what happened and why.</p>
+                </div>
+            </div>
+
+            <form id="tradeForm" class="trade-form">
+
+                <div class="form-card">
+                    <h3>Trade</h3>
+
+                    <div class="form-grid">
+
+                        <div class="field">
+                            <label for="tradeDate">Date</label>
+                            <input id="tradeDate" type="date" required>
+                        </div>
+
+                        <div class="field">
+                            <label for="tradeSession">Session</label>
+                            <select id="tradeSession" required>
+                                <option value="Asia">Asia</option>
+                                <option value="London">London</option>
+                                <option value="New York">New York</option>
+                                <option value="Weekend">Weekend</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="tradeCoin">Coin</label>
+                            <input id="tradeCoin" type="text" placeholder="BTC" autocomplete="off" required>
+                        </div>
+
+                        <div class="field">
+                            <label for="tradeDirection">Trend</label>
+                            <select id="tradeDirection" required>
+                                <option value="Hyperbull">Hyperbull</option>
+                                <option value="long">Bull</option>
+                                <option value="conso">Consolidation</option>
+                                <option value="short">Bear</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="tradeSetup">Setup</label>
+                            <select id="tradeSetup">
+                                <option value="Breakout">Breakout</option>
+                                <option value="Confluences">Confluences</option>
+                                <option value="FOMO">FOMO</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="tradeSL">SL %</label>
+                            <input id="tradeSL" type="number" step="any" placeholder="5">
+                        </div>
+
+                        <div class="field">
+                            <label for="tradeTP">TP %</label>
+                            <input id="tradeTP" type="number" step="any" placeholder="15">
+                        </div>
+
+                        <div class="field">
+                            <label for="tradeRR">RR</label>
+                            <input id="tradeRR" type="number" step="any" placeholder="3">
+                        </div>
+
+                        <div class="field">
+                            <label for="tradeResult">Result %</label>
+                            <input id="tradeResult" type="number" step="any" placeholder="e.g. 5.25 or -2">
+                        </div>
+
+                        <div class="field">
+                            <label>Rules Followed</label>
+                            <div class="toggle-pair">
+                                <button type="button" class="toggle-btn" id="rulesYesBtn">Yes</button>
+                                <button type="button" class="toggle-btn" id="rulesNoBtn">No</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <h3>Entry Reason</h3>
+                    <div class="form-grid">
+                        <div class="field full">
+                            <label for="tradeReason">Why did you enter?</label>
+                            <textarea id="tradeReason" placeholder="Describe the main reason you entered this trade..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <h3>Confluences</h3>
+                    <div class="confluence-grid" id="confluenceGrid"></div>
+                </div>
+
+                <div class="form-card">
+                    <h3>Journal</h3>
+                    <div class="form-grid">
+
+                        <div class="field full">
+                            <label for="tradeThesis">Entry Thesis</label>
+                            <textarea id="tradeThesis" placeholder="What did you believe would happen when you entered?"></textarea>
+                        </div>
+
+                        <div class="field full">
+                            <label for="tradeWhatHappened">What Happened?</label>
+                            <textarea id="tradeWhatHappened" placeholder="Describe how the trade actually played out..."></textarea>
+                        </div>
+
+                        <div class="field full">
+                            <label for="tradeBetter">What To Do Better</label>
+                            <textarea id="tradeBetter" placeholder="Be specific — what will you actually do differently next time?"></textarea>
+                        </div>
+
+                        <div class="field full">
+                            <label for="tradeLesson">Lesson</label>
+                            <input id="tradeLesson" type="text" maxlength="140" placeholder="One sentence — this is what shows on your full sheet.">
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="editor-actions">
+                    <div class="action-left">
+                        <button id="deleteTradeBtn" class="action-btn delete-btn" type="button">Delete Trade</button>
+                    </div>
+                    <div class="action-right">
+                        <button id="cancelTradeBtn" class="action-btn cancel-btn" type="button">Cancel</button>
+                        <button class="action-btn save-btn" type="submit">Save Trade</button>
+                    </div>
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <script>
+
+        /* ========================= SIDEBAR ========================= */
+        const menuBtn = document.getElementById("menuBtn");
+        const sidebar = document.getElementById("sidebar");
+        const backdrop = document.getElementById("backdrop");
+
+        function openSidebar() { sidebar.classList.add("open"); backdrop.classList.add("open"); }
+        function closeSidebar() { sidebar.classList.remove("open"); backdrop.classList.remove("open"); }
+
+        menuBtn.addEventListener("click", () => sidebar.classList.contains("open") ? closeSidebar() : openSidebar());
+        backdrop.addEventListener("click", closeSidebar);
+        document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSidebar(); });
+
+        /* ========================= STORAGE ========================= */
+        const STORAGE_KEY = "tc_trade_journal";
+        let trades = [];
+        let editingTradeId = null;
+        let currentPage = 1;
+
+        const tradeList = document.getElementById("tradeList");
+        const tradeEditor = document.getElementById("tradeEditor");
+        const tradeTableBody = document.getElementById("tradeTableBody");
+        const emptyState = document.getElementById("emptyState");
+
+        const newTradeBtn = document.getElementById("newTradeBtn");
+        const emptyNewTradeBtn = document.getElementById("emptyNewTradeBtn");
+        const backToListBtn = document.getElementById("backToListBtn");
+        const cancelTradeBtn = document.getElementById("cancelTradeBtn");
+        const deleteTradeBtn = document.getElementById("deleteTradeBtn");
+
+        const searchInput = document.getElementById("searchInput");
+        const resultFilter = document.getElementById("resultFilter");
+        const directionFilter = document.getElementById("directionFilter");
+       
+
+        const tradeForm = document.getElementById("tradeForm");
+        const editorHeading = document.getElementById("editorHeading");
+
+        const tradeDate = document.getElementById("tradeDate");
+        const tradeSession = document.getElementById("tradeSession");
+        const tradeCoin = document.getElementById("tradeCoin");
+        const tradeDirection = document.getElementById("tradeDirection");
+        const tradeSetup = document.getElementById("tradeSetup");
+        const tradeSL = document.getElementById("tradeSL");
+        const tradeTP = document.getElementById("tradeTP");
+        const tradeRR = document.getElementById("tradeRR");
+        const tradeResultInput = document.getElementById("tradeResult");
+        const tradeReason = document.getElementById("tradeReason");
+        const tradeThesis = document.getElementById("tradeThesis");
+        const tradeWhatHappened = document.getElementById("tradeWhatHappened");
+        const tradeBetter = document.getElementById("tradeBetter");
+        const tradeLesson = document.getElementById("tradeLesson");
+
+        const rulesYesBtn = document.getElementById("rulesYesBtn");
+        const rulesNoBtn = document.getElementById("rulesNoBtn");
+        let formRulesValue = "yes";
+
+        function setRulesUI(val) {
+            formRulesValue = val;
+            rulesYesBtn.classList.toggle("selected-yes", val === "yes");
+            rulesNoBtn.classList.toggle("selected-no", val === "no");
+        }
+        rulesYesBtn.addEventListener("click", () => setRulesUI("yes"));
+        rulesNoBtn.addEventListener("click", () => setRulesUI("no"));
+
+        /* ========================= CONFLUENCES ========================= */
+        const confluenceDefs = [
+            ["confDailyOB", "Daily OB"],
+            ["confDailyFVG", "Daily FVG"],
+            ["conf4HOB", "4H OB"],
+            ["conf4HFVG", "4H FVG"],
+            ["conf1HOB", "1H OB"],
+            ["conf1HFVG", "1H FVG"],
+             ["conf15mOB", "15m OB"],
+            ["conf15mFVG", "15m FVG"],
+            ["conf5mOB", "5m OB"],
+            ["conf5mFVG", "5m FVG"],
+            ["confLiquiditySweep", "15m Liquidity Sweep"],
+            ["confBOS", "BOS"],
+            ["confVolume", "Volume"],
+            ["confTrend", "HTF Trend"],
+            ["confBreakout", "Breakout"],
+            ["confBPR", "BPR"],
+           
+        ];
+        const confluenceIds = confluenceDefs.map(d => d[0]);
+        const confluenceLabels = Object.fromEntries(confluenceDefs);
+
+        const confluenceGrid = document.getElementById("confluenceGrid");
+        confluenceDefs.forEach(([id, label]) => {
+            const item = document.createElement("div");
+            item.className = "confluence-item";
+            item.innerHTML = `<input type="checkbox" id="${id}"><label for="${id}">${label}</label>`;
+            confluenceGrid.appendChild(item);
+        });
+
+    
+
+
+
+
+       
+
+        /* ========================= HELPERS ========================= */
+
+        function getLocalDateInputValue() {
+            const now = new Date();
+            const offset = now.getTimezoneOffset();
+            return new Date(now.getTime() - offset * 60000).toISOString().split("T")[0];
+        }
+
+    async function loadTrades() {
+    try {
+        const res = await fetch("/api/trades");
+        const data = await res.json();
+        trades = data.map(fromApiTrade);
+    } catch (error) {
+        console.error("Failed to load journal trades:", error);
+        trades = [];
+    }
+}
+
+        function saveTrades() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(trades));
+            } catch (error) {
+                console.error("Failed to save journal trades:", error);
+            }
+        }
+
+        function createId() {
+            return Date.now().toString(36) + Math.random().toString(36).slice(2);
+        }
+
+        function toApiTrade(trade) {
+    return {
+        date: trade.date,
+        session: trade.session,
+        coin: trade.coin,
+        direction: trade.direction,
+        setup: trade.setup,
+        rules_followed: trade.rules === "yes",
+        sl: trade.sl === "" ? null : Number(trade.sl),
+        tp: trade.tp === "" ? null : Number(trade.tp),
+        rr: trade.rr === "" ? null : Number(trade.rr),
+        pnl: trade.pnl === "" ? null : Number(trade.pnl),
+        reason: trade.reason,
+        confluences: trade.confluences,
+        thesis: trade.thesis,
+        what_happened: trade.whatHappened,
+        better: trade.better,
+        lesson: trade.lesson
+    };
+}
+
+function fromApiTrade(t) {
+    return {
+        id: t.id,
+        date: t.date,
+        session: t.session,
+        coin: t.coin,
+        direction: t.direction,
+        setup: t.setup,
+        rules: t.rules_followed ? "yes" : "no",
+        sl: t.sl ?? "",
+        tp: t.tp ?? "",
+        rr: t.rr ?? "",
+        pnl: t.pnl ?? "",
+        reason: t.reason || "",
+        confluences: t.confluences || [],
+        thesis: t.thesis || "",
+        whatHappened: t.what_happened || "",
+        better: t.better || "",
+        lesson: t.lesson || ""
+    };
+}
+
+        function escapeHTML(value) {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function trendLabel(direction) {
+            switch (direction) {
+                case "Hyperbull": return "Hyperbull";
+                case "long": return "Bull";
+                case "conso": return "Consolidation";
+                case "short": return "Bear";
+                default: return direction || "—";
+            }
+        }
+
+        function trendClass(direction) {
+            switch (direction) {
+                case "Hyperbull": return "direction-hyperbull";
+                case "long": return "direction-long";
+                case "conso": return "direction-conso";
+                case "short": return "direction-short";
+                default: return "";
+            }
+        }
+
+        function pnlCategory(pnl) {
+            const n = Number(pnl);
+            if (pnl === "" || pnl === null || pnl === undefined || !Number.isFinite(n)) return "none";
+            if (n > 0) return "win";
+            if (n < 0) return "loss";
+            return "breakeven";
+        }
+
+        function pnlClass(pnl) {
+            const cat = pnlCategory(pnl);
+            if (cat === "win") return "pnl-positive";
+            if (cat === "loss") return "pnl-negative";
+            return "pnl-neutral";
+        }
+
+        function formatPnl(value) {
+            if (value === "" || value === null || value === undefined) return "—";
+            const number = Number(value);
+            if (!Number.isFinite(number)) return escapeHTML(value);
+            const sign = number > 0 ? "+" : "";
+            return `${sign}${number}%`;
+        }
+
+        function normalizeTrade(trade) {
+            // legacy support: old entries may have separate result + pnl fields
+            let pnl = trade.pnl;
+            if ((pnl === undefined || pnl === null || pnl === "") && trade.result !== undefined) {
+                pnl = "";
+            }
+
+            return {
+                id: trade.id || createId(),
+                date: trade.date || "",
+                session: trade.session || "New York",
+                coin: trade.coin || "",
+                direction: trade.direction || "long",
+                setup: trade.setup || "Breakout",
+                rules: trade.rules || "yes",
+                sl: trade.sl ?? "",
+                tp: trade.tp ?? "",
+                rr: trade.rr ?? "",
+                pnl: pnl === undefined || pnl === null ? "" : pnl,
+                reason: trade.reason || trade.entryReason || "",
+                confluences: Array.isArray(trade.confluences) ? trade.confluences : [],
+                thesis: trade.thesis || trade.entryThesis || "",
+                whatHappened: trade.whatHappened || "",
+                better: trade.better || "",
+                lesson: trade.lesson || "",
+                createdAt: trade.createdAt || Date.now(),
+                updatedAt: trade.updatedAt || Date.now()
+            };
+        }
+
+        function confluenceCellHTML(list) {
+            if (!list || !list.length) return "—";
+            const labels = list.map(id => confluenceLabels[id] || id);
+            return escapeHTML(labels.join(", "));
+        }
+
+        /* ========================= RENDER ========================= */
+
+function renderPagination(totalPages) {
+    const bar = document.getElementById("paginationBar");
+    bar.innerHTML = "";
+    if (totalPages <= 1) return;   // <-- add this
+    for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.style.opacity = i === currentPage ? "1" : "0.5";
+        btn.addEventListener("click", () => { currentPage = i; renderTrades(); });
+        bar.appendChild(btn);
+    }
+}
+
+
+        function renderTrades() {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            const selectedResult = resultFilter.value;
+            const selectedDirection = directionFilter.value;
+      
+
+            const filteredTrades = trades
+                .map(normalizeTrade)
+                .filter(trade => {
+                    const searchableText = [
+                        trade.coin, trade.session, trade.setup, trade.reason,
+                        trade.thesis, trade.whatHappened, trade.better, trade.lesson,
+                        trade.sl, trade.tp, trade.rr,
+                        ...(trade.confluences || []).map(id => confluenceLabels[id] || id)
+                    ].join(" ").toLowerCase();
+
+                    const matchesSearch = !searchTerm || searchableText.includes(searchTerm);
+                    const matchesResult = selectedResult === "all" || pnlCategory(trade.pnl) === selectedResult;
+                    const matchesDirection = selectedDirection === "all" || trade.direction === selectedDirection;
+                   const matchesConfluence = selectedConfluenceFilters.size === 0 ||
+      [...selectedConfluenceFilters].some(id => (trade.confluences || []).includes(id));
+
+                    return matchesSearch && matchesResult && matchesDirection && matchesConfluence;
+                })
+                .sort((a, b) => {
+                    const dateA = new Date(a.date || 0).getTime();
+                    const dateB = new Date(b.date || 0).getTime();
+                    if (dateB !== dateA) return dateB - dateA;
+                    return (b.updatedAt || 0) - (a.updatedAt || 0);
+                });
+
+                const PAGE_SIZE = 15;
+currentPage = 1;
+const totalPages = Math.max(1, Math.ceil(filteredTrades.length / PAGE_SIZE));
+currentPage = Math.min(currentPage, totalPages);
+const start = (currentPage - 1) * PAGE_SIZE;
+const pageTrades = filteredTrades.slice(start, start + PAGE_SIZE);
+
+            tradeTableBody.innerHTML = "";
+
+            if (trades.length === 0) {
+                emptyState.style.display = "block";
+                emptyState.innerHTML = `
+                    <h3>No trades yet</h3>
+                    <p>Your completed trades will appear here.</p>
+                    <button id="emptyNewTradeBtn" class="new-trade-btn" type="button">+ Record Your First Trade</button>
+                `;
+                document.getElementById("emptyNewTradeBtn").addEventListener("click", newTrade);
+                return;
+            }
+
+            if (filteredTrades.length === 0) {
+                emptyState.style.display = "block";
+                emptyState.innerHTML = `<h3>No matching trades</h3><p>Try changing your search or filters.</p>`;
+                return;
+            }
+
+            emptyState.style.display = "none";
+
+            pageTrades.forEach(trade => {
+                const row = document.createElement("tr");
+                row.dataset.id = trade.id;
+
+                row.innerHTML = `
+                    <td>${escapeHTML(trade.date || "—")}</td>
+                    <td><span class="coin-name">${escapeHTML(trade.coin || "—")}</span></td>
+                    <td class="${trendClass(trade.direction)}">${escapeHTML(trendLabel(trade.direction))}</td>
+                    <td class="reason-cell" title="${escapeHTML(trade.reason || "")}">${escapeHTML(trade.reason || trade.setup || "—")}</td>
+                    <td class="${pnlClass(trade.pnl)}">${formatPnl(trade.pnl)}</td>
+                    <td class="${trade.rules === "yes" ? "rules-yes" : "rules-no"}">${trade.rules === "yes" ? "Yes" : "No"}</td>
+                    <td class="confluence-cell" title="${escapeHTML((trade.confluences || []).map(id => confluenceLabels[id] || id).join(", "))}">${confluenceCellHTML(trade.confluences)}</td>
+                    <td class="reason-cell" title="${escapeHTML(trade.lesson || "")}">${escapeHTML(trade.lesson || "—")}</td>
+                `;
+
+                row.addEventListener("click", () => openTrade(trade.id));
+                tradeTableBody.appendChild(row);
+            });
+            renderPagination(totalPages)
+        }
+
+        /* ========================= NEW / OPEN TRADE ========================= */
+
+        function newTrade() {
+            editingTradeId = null;
+            tradeForm.reset();
+            editorHeading.textContent = "New Trade";
+
+            tradeDate.value = getLocalDateInputValue();
+            tradeSession.value = "New York";
+            tradeDirection.value = "Hyperbull";
+            tradeSetup.value = "Breakout";
+            setRulesUI("yes");
+
+            tradeSL.value = "";
+            tradeTP.value = "";
+            tradeRR.value = "";
+            tradeResultInput.value = "";
+            tradeBetter.value = "";
+            tradeLesson.value = "";
+
+            confluenceIds.forEach(id => {
+                const checkbox = document.getElementById(id);
+                if (checkbox) checkbox.checked = false;
+            });
+
+            deleteTradeBtn.style.display = "none";
+            showEditor();
+        }
+
+        function openTrade(id) {
+            const rawTrade = trades.find(trade => trade.id === id);
+            if (!rawTrade) return;
+
+            const trade = normalizeTrade(rawTrade);
+            editingTradeId = id;
+            editorHeading.textContent = "Edit Trade";
+
+            tradeDate.value = trade.date;
+
+            const validSessions = ["Asia", "London", "New York", "Weekend"];
+            tradeSession.value = validSessions.includes(trade.session) ? trade.session : "New York";
+
+            tradeCoin.value = trade.coin;
+
+            const validDirections = ["Hyperbull", "long", "conso", "short"];
+            tradeDirection.value = validDirections.includes(trade.direction) ? trade.direction : "long";
+
+            const validSetups = ["Breakout", "Confluences", "FOMO"];
+            tradeSetup.value = validSetups.includes(trade.setup) ? trade.setup : "Breakout";
+
+            setRulesUI(trade.rules === "no" ? "no" : "yes");
+
+            tradeSL.value = trade.sl;
+            tradeTP.value = trade.tp;
+            tradeRR.value = trade.rr;
+            tradeResultInput.value = trade.pnl;
+
+            tradeReason.value = trade.reason;
+            tradeThesis.value = trade.thesis;
+            tradeWhatHappened.value = trade.whatHappened;
+            tradeBetter.value = trade.better;
+            tradeLesson.value = trade.lesson;
+
+            const savedConfluences = Array.isArray(trade.confluences) ? trade.confluences : [];
+            confluenceIds.forEach(id => {
+                const checkbox = document.getElementById(id);
+                if (checkbox) checkbox.checked = savedConfluences.includes(id);
+            });
+
+            deleteTradeBtn.style.display = "inline-block";
+            showEditor();
+        }
+
+        function showEditor() {
+            tradeList.classList.add("hidden");
+            tradeEditor.classList.add("active");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function showTradeList() {
+            tradeEditor.classList.remove("active");
+            tradeList.classList.remove("hidden");
+            renderTrades();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        let selectedConfluenceFilters = new Set();
+const trigger = document.getElementById("confluenceFilterTrigger");
+const panel = document.getElementById("confluenceFilterPanel");
+
+confluenceDefs.forEach(([id, label]) => {
+    const row = document.createElement("label");
+    row.className = "multiselect-option";
+    row.innerHTML = `<input type="checkbox" value="${id}"> ${label}`;
+    row.querySelector("input").addEventListener("change", e => {
+        e.target.checked ? selectedConfluenceFilters.add(id) : selectedConfluenceFilters.delete(id);
+        trigger.textContent = selectedConfluenceFilters.size
+            ? `${selectedConfluenceFilters.size} Confluence${selectedConfluenceFilters.size > 1 ? "s" : ""}`
+            : "All Confluences";
+        currentPage = 1;
+        renderTrades();
+    });
+    panel.appendChild(row);
+});
+
+trigger.addEventListener("click", () => panel.classList.toggle("open"));
+document.addEventListener("click", e => {
+    if (!document.getElementById("confluenceFilterWrapper").contains(e.target)) panel.classList.remove("open");
+});
+
+        /* ========================= SAVE / DELETE ========================= */
+
+        tradeForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const confluences = confluenceIds.filter(id => {
+        const checkbox = document.getElementById(id);
+        return checkbox && checkbox.checked;
+    });
+
+    const trade = {
+        date: tradeDate.value,
+        session: tradeSession.value,
+        coin: tradeCoin.value.trim().toUpperCase(),
+        direction: tradeDirection.value,
+        setup: tradeSetup.value,
+        rules: formRulesValue,
+        sl: tradeSL.value.trim(),
+        tp: tradeTP.value.trim(),
+        rr: tradeRR.value.trim(),
+        pnl: tradeResultInput.value.trim(),
+        reason: tradeReason.value.trim(),
+        confluences,
+        thesis: tradeThesis.value.trim(),
+        whatHappened: tradeWhatHappened.value.trim(),
+        better: tradeBetter.value.trim(),
+        lesson: tradeLesson.value.trim()
+    };
+
+    const url = editingTradeId ? `/api/trades/${editingTradeId}` : "/api/trades";
+    const method = editingTradeId ? "PUT" : "POST";
+
+    const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(toApiTrade(trade))
+    });
+
+    if (!res.ok) { alert("Failed to save trade."); return; }
+
+    await loadTrades();
+    showTradeList();
+});
+
+       deleteTradeBtn.addEventListener("click", async function () {
+    if (!editingTradeId) return;
+    const confirmed = confirm(`Delete this trade? This cannot be undone.`);
+    if (!confirmed) return;
+
+    await fetch(`/api/trades/${editingTradeId}`, { method: "DELETE" });
+    editingTradeId = null;
+    await loadTrades();
+    showTradeList();
+});
+
+        /* ========================= BUTTONS / FILTERS ========================= */
+        currentPage = 1;
+        newTradeBtn.addEventListener("click", newTrade);
+        backToListBtn.addEventListener("click", showTradeList);
+        cancelTradeBtn.addEventListener("click", showTradeList);
+
+        searchInput.addEventListener("input", () => { currentPage = 1; renderTrades(); });
+        resultFilter.addEventListener("change", () => { currentPage = 1; renderTrades(); });
+        directionFilter.addEventListener("change", () => { currentPage = 1; renderTrades(); });
+        
+
+        /* ========================= INIT ========================= */
+
+        loadTrades();
+        (async function init() {
+    await loadTrades();
+    renderTrades();
+})();
+
+    </script>
+
+</body>
+</html>
