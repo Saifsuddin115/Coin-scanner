@@ -1442,38 +1442,7 @@ function checkBreakoutBPR(choice) {
 
     }, NEXT_DELAY);
 }
-    // Bull and HyperBull: the breakout already happened, BPR only changes the target
-    if (choice === 'Yes') {
-
-        if (lastSetupChoice === 'HyperBull') {
-
-            result.innerHTML =
-                'BPR confirmed. Aim for the high on the higher timeframe.';
-
-        } else {
-
-            result.innerHTML =
-                'BPR confirmed. Aim for the highest high.';
-        }
-
-    } else {
-
-        result.innerHTML =
-            'No BPR present. Aim for the NEXT HIGH!';
-    }
-
-    revealText(result);
-
-
-    disableButtons('breakoutBPR');
-
-
-    setTimeout(() => {
-
-        showBreakoutValid();
-
-    }, NEXT_DELAY);
-
+  
 
 function checkLTF(choice) {
     if (choice === 'Bull') {
