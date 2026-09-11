@@ -139,10 +139,12 @@ ALLOWED_TRADE_FIELDS = {
 
 @app.post("/login")
 def login():
-    if request.form.get("password") == os.environ["APP_PASSWORD"]:
+    data = request.get_json(silent=True) or {}
+    password = data.get("password") or request.form.get("password")
+    if password == os.environ["APP_PASSWORD"]:
         session["authed"] = True
-        session.permanent = True  # stays logged in across visits
-        return redirect("/")
+        session.permanent = True
+        return "", 204
     return "wrong password", 401
 
 @app.get("/api/trades")
