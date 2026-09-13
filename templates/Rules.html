@@ -126,7 +126,9 @@ h2,h3,h4,h5,h6,h7 {
 #question3,
 #question4,
 #tradeButtons,
-#confluences {
+#confluences,
+#proveHH,
+#proveVolume {
     padding: 20px;
     font-family: 'Playfair Display', serif;
     color: var(--gold);
@@ -149,7 +151,9 @@ h2,h3,h4,h5,h6,h7 {
 #question3.fade-out,
 #question4.fade-out,
 #tradeButtons.fade-out,
-#confluences.fade-out {
+#confluences.fade-out,
+ #provehh.fade-out,
+ #proveVolume.fade-out {
 
     opacity: 0;
 
@@ -220,7 +224,7 @@ button:active {
     line-height: 1.6;
 }
 
-#verdictFomo, #verdictLimit, #verdictInvalid, #verdictBearish, #verdictBreakoutWait, #verdictHyperNo {
+#verdictFomo, #verdictLimit, #verdictInvalid, #verdictBearish, #verdictBreakoutWait, #verdictHyperNo,  #verdictHyperMisclassified{
     color: #c97a6c;
     background: var(--surface);
     border: 1px solid var(--invalid);
@@ -447,7 +451,7 @@ h2{
     margin: 5px;
   }
   #question1, #questionBreakout, #Breakout, #breakoutBPR, #questionLTF,
-  #question2, #question3, #question4, #tradeButtons, #confluences {
+  #question2, #question3, #question4, #tradeButtons, #confluences, #proveHH, #proveVolume {
     padding: 14px;
     width: min(340px, 94vw);
     transform: translateY(-30px);
@@ -524,12 +528,39 @@ h2{
 </svg></button>
 </div>
 
-<!-- BREAKOUT GATE: decides whether we take the Breakout/BPR path
-     or fall through to the normal LTF / indecision / FOMO logic -->
+<div id="proveHH" style="display:none">
+    <h2>HyperBull check</h2>
+Is the trend making CONSISTENT HIGHER HIGHS on atleast 15 MIN TF?
+<p>
+<button type="button" onclick="checkProveHH('Yes')">Yes<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+<button type="button" onclick="checkProveHH('No')">No<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+</div>
+
+<div id="proveVolume" style="display:none">
+    <h2>HyperBull check</h2>
+Does the trend have INSANE VOLUME?
+<p>
+<button type="button" onclick="checkProveVolume('Yes')">Yes<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+<button type="button" onclick="checkProveVolume('No')">No<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+</div>
+
+
 
 <div id="questionBreakout" style="display:none">
     <h2>BREAKOUT CHECK</h2>
-Is there actually a BREAKOUT on this setup? A 15 min candle has to CLOSE ABOVE the high.
+Is there actually a BREAKOUT on this setup? A 15 min candle has to CLOSE ABOVE the high WITH STRONG VOLUME.
 <p>
 <button type="button" onclick="checkBreakoutExists('Yes')">Yes<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
   <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
@@ -546,20 +577,22 @@ Is there actually a BREAKOUT on this setup? A 15 min candle has to CLOSE ABOVE t
 </svg></button>
 </div>
 
-<!-- BREAKOUT PATH -->
 
 <div id="Breakout" style="display:none">
 
     <h2>BREAKOUT CONFIRMATION</h2>
 
-    <span id="breakoutQuestionText">Did a bullish candle CLOSE above a higher-timeframe high?</span>
-
-    <br><br>
-
-    <strong id="breakoutSubText">
+     <strong id="breakoutSubText">
         Only an Hourly timeframe or higher counts.
         A wick through the high does NOT count.
     </strong>
+    <br><br>
+
+    <span id="breakoutQuestionText">Did a bullish candle CLOSE above a higher-timeframe high with STRONG VOLUME?</span>
+
+    
+
+   
 
     <p>
 
@@ -648,7 +681,7 @@ Is there actually a BREAKOUT on this setup? A 15 min candle has to CLOSE ABOVE t
 
     <h2>BPR CONFIRMATION</h2>
 
-    Is there a BPR to the left of your current entry? Meaning an zone of insane sell off, only bearish candles on the 4hr/D tf?
+    Is there a BPR to the left of your current entry? Meaning only bearish candles on the 4hr/D tf?
 
     <p>
 
@@ -749,7 +782,7 @@ Is there a high TF DOJI (In a bull trend), indecision (Long wicks), or a bearish
 
 <div id="question3" style="display:none">
     <h5>FOMO</h5>
-You KNOW if you are lying to yourself, use confluences continuation does not count nor does break of high. Is this a FOMO trade?
+You KNOW if you are lying to yourself, DO NOT LOWER YOURE STANDARDS, not taking a mediocore trade is better then losing. Is this a FOMO/Impatience trade?
 <p>
 <button type="button" onclick="FOMO('FOMO')">Yes<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
   <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
@@ -881,17 +914,16 @@ You KNOW if you are lying to yourself, use confluences continuation does not cou
 
 <div id="verdictOverlay">
 <div id="verdictValid" style="display:none">
+    <div id="tradeDetails" class="verdict-body" style="margin-bottom:20px; border-bottom:1px solid var(--surface-border); padding-top:0px; margin-top:-28px;"></div>
+    <br>
     <div class="verdict-title">VALID SETUP ✅</div>
     <div class="verdict-body">
-        Rules you are REQUIRED to follow:<br><br>
         <br>
         - Do NOT move SL or TP<br>
         <br>
-        <br>
-        <br>
-        <br>
         You are not using the TC, the TC is using you. If you do not follow these rules, you'll ask why you didn't follow them.
     </div>
+      
 </div>
 <div id="verdictFomo" style="display:none">⚠ SETUP INVALID<br><br>FOMO detected;</div>
 <div id="verdictLimit" style="display:none">⚠  SETUP INVALID<br><br>Daily trade limit reached;</div>
@@ -899,6 +931,7 @@ You KNOW if you are lying to yourself, use confluences continuation does not cou
 <div id="verdictBearish" style="display:none">⚠ SETUP INVALID<br><br>Bearish trend detected;</div>
 <div id="verdictBreakoutWait" style="display:none">⚠ NOT CONFIRMED<br><br>No full close above the high yet — wait for confirmation, don't chase the wick;</div>
 <div id="verdictHyperNo" style="display:none">⚠ DO NOT TAKE THIS TRADE<br><br>Save your capital;</div>
+<div id="verdictHyperMisclassified" style="display:none">⚠ SETUP INVALID<br><br>Incorrectly classified as hyperbull;</div>
 
 <button id="verdictActionBtn" onclick="location.reload()">
         Continue
@@ -969,7 +1002,7 @@ function showBreakoutValid() {
     overlay.style.display =
         'flex';
 
-
+     setTradeDetails();
     showContinueToCoinbase();
 }
 
@@ -1230,13 +1263,17 @@ showResetButton();
 
 function goToSetupNext() {
 
-    if (
+    if (lastSetupChoice === 'HyperBull') {
+
+        // HyperBull has to prove itself before reaching the breakout gate.
+        goToNext('question1', 'proveHH');
+
+    } else if (
         lastSetupChoice === 'Bull' ||
-        lastSetupChoice === 'Consolidation' ||
-        lastSetupChoice === 'HyperBull'
+        lastSetupChoice === 'Consolidation'
     ) {
 
-        // Every non-bearish trend now passes through the breakout gate first.
+        // Every other non-bearish trend passes through the breakout gate first.
         goToNext('question1', 'questionBreakout');
 
     } else {
@@ -1246,6 +1283,83 @@ function goToSetupNext() {
     }
 
     disableButtons('question1');
+}
+
+// PROVE IT gate, step 1: higher highs check.
+function checkProveHH(choice) {
+
+    if (choice === 'No') {
+
+        document.getElementById('verdictOverlay').style.background =
+            'var(--scrim-error)';
+
+        document.getElementById('verdictHyperMisclassified').style.display =
+            'block';
+
+        document.getElementById('verdictOverlay').style.display =
+            'flex';
+
+        disableButtons('proveHH');
+
+        return;
+    }
+
+    disableButtons('proveHH');
+    goToNext('proveHH', 'proveVolume');
+}
+
+// PROVE IT gate, step 2: volume check.
+function checkProveVolume(choice) {
+
+    if (choice === 'No') {
+
+        document.getElementById('verdictOverlay').style.background =
+            'var(--scrim-error)';
+
+        document.getElementById('verdictHyperMisclassified').style.display =
+            'block';
+
+        document.getElementById('verdictOverlay').style.display =
+            'flex';
+
+        disableButtons('proveVolume');
+
+        return;
+    }
+
+    disableButtons('proveVolume');
+    goToNext('proveVolume', 'questionBreakout');
+}
+
+// Fills in the "Trade Details" section on the valid verdict, based on
+// which Setup trend was chosen at the start.
+function setTradeDetails() {
+
+    const el = document.getElementById('tradeDetails');
+    if (!el) return;
+
+    let trendLabel = 'Trend';
+    let aim = '';
+
+    if (lastSetupChoice === 'HyperBull') {
+        trendLabel = 'Hyper Bullish (Parabolic)';
+        aim = 'the STRONGEST take-profit target.';
+    } else if (lastSetupChoice === 'Bull') {
+        trendLabel = 'Bullish (Higher highs)';
+        aim = 'the CLOSEST take-profit target.';
+    } else if (lastSetupChoice === 'Consolidation') {
+        trendLabel = 'Consolidation (Sideways)';
+        aim = 'the next high.';
+    } else {
+        trendLabel = lastSetupChoice || 'Unknown';
+        aim = 'the next high.';
+    }
+
+    el.innerHTML =
+        '<strong>TRADE DETAILS</strong><br>Trend: ' +
+        trendLabel +
+        '<br>Aim: ' +
+        aim;
 }
 
 // THE GATE: is there actually a breakout on this setup or not.
@@ -1454,11 +1568,23 @@ function checkBreakoutBPR(choice) {
     disableButtons('breakoutBPR');
 
 
+  setTimeout(() => {
+    const modal = document.getElementById('confirmModal');
+    const yesBtn = document.getElementById('modalYes');
+    const noBtn = document.getElementById('modalNo');
+
+    modal.showModal();
+
+    // Force the 5-second pause before allowing confirmation
+    yesBtn.disabled = true;
+    noBtn.disabled = true;
+
     setTimeout(() => {
+        yesBtn.disabled = false;
+        noBtn.disabled = false;
+    }, 4000);
 
-        showBreakoutValid();
-
-    }, NEXT_DELAY);
+}, NEXT_DELAY);
 }
   
 
@@ -1558,6 +1684,7 @@ document.getElementById('modalYes').addEventListener('click', function() {
     document.getElementById('verdictOverlay').style.background = 'var(--scrim-gold)';
     document.getElementById('verdictValid').style.display = 'block';
     document.getElementById('verdictOverlay').style.display = 'flex';
+    setTradeDetails();
     disableCheckboxes("confluences");
     showContinueToCoinbase();
 });
