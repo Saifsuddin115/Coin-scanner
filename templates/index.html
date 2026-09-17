@@ -408,21 +408,13 @@ function renderCoins(data) {
         item.target = "_blank";
         item.rel = "noopener noreferrer";
         
-        let statusClass = "status-unclear";
-
-if (coin.halal_status.status === "halal") {
-    statusClass = "status-halal";
-}
-else if (coin.halal_status.status === "haram") {
-    statusClass = "status-haram";
-}
+      
 
         item.innerHTML = `
             <div class="coin-rank">${index + 1}</div>
             <div class="coin-info">
                 <p class="symbol">
     ${coin.symbol}
-    <span class="status-dot ${statusClass}" data-tooltip="${coin.halal_status.status.toUpperCase()}: ${coin.halal_status.reason}"></span>
 </p>
                 <p class="name">${coin.name}</p>
                 ${coin.volume_24h !== undefined

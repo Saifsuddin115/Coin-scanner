@@ -1,40 +1,31 @@
 from dotenv import load_dotenv
 load_dotenv()
-from google import genai
-import json
 import os
 from functools import wraps
 from datetime import datetime
-from flask import Flask, request, jsonify, session, redirect
+from flask import Flask, request, jsonify, session, redirect, render_template
+import requests
 from models import db, Trade, MonthlySummary
 
 
-
-
-
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-MODEL_NAME = "gemini-3.1-flash-lite"
-
-from flask import Flask, render_template
-import requests
-
-
-CACHE_FILE = "halal_cache.json"
-BLACKLIST = {"PIRATE", "THQ"}
 REQUEST_TIMEOUT = 10  # seconds — prevents a stalled Coinbase call from hanging the server
 
-
-def load_cache():
-    try:
-        with open(CACHE_FILE, "r") as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
-
-
-def save_cache(cache):
-    with open(CACHE_FILE, "w") as f:
-        json.dump(cache, f, indent=2)
+# Coins to exclude from the gainers list outright (was BLACKLIST + Gemini haram calls).
+# Pulled from your halal_cache.json's confirmed "haram"/"likely haram" entries.
+# Add to this manually as you spot new ones — no API call, no lookup delay.
+EXCLUDED_SYMBOLS = {
+    # meme coins
+    "PUMP", "MOG", "USELESS", "SPX", "BONK", "KEYCAT", "TROLL", "BIRB",
+    "CLANKER", "TURBO", "FUN1", "PENGU", "DOGINME", "TRUMP", "BASECAT",
+    # lending / interest-based (riba)
+    "LQTY", "AAVE", "EUL", "KMNO", "UP", "GFI", "MORPHO", "FARM", "WELL", "QI",
+    # perpetuals / leveraged derivatives
+    "DRV", "PERP",
+    # yield/staking-as-interest edge cases
+    "JTO", "ONDO", "BLAST", "DRB",
+    # legacy blacklist from before
+    "PIRATE", "THQ",
+}
 
 
 def safe_float(val):
@@ -42,71 +33,6 @@ def safe_float(val):
         return float(val)
     except (TypeError, ValueError):
         return None
-
-
-def check_halal(symbol, name):
-    cache = load_cache()
-
-    if symbol in cache:
-        return cache[symbol]
-
-    prompt = f"""
-You are screening a cryptocurrency project for Islamic finance compliance.
-
-Project Name: {name}
-Ticker: {symbol}
-
-Determine whether the PRIMARY purpose of this project is:
-
-- halal
-- haram
-- unclear
-
-A project should only be "haram" if its primary utility revolves around:
-- interest or lending
-- perpetual futures or leveraged derivatives
-- gambling or betting
-- meme coin
-
-Do NOT classify a project as haram simply because it can be traded.
-
-Respond ONLY as valid JSON.
-
-{{
-    "status": "halal",
-    "confidence score":"number",
-    "reason": "One short sentence explaining why."
-}}
-"""
-
-    try:
-        response = client.models.generate_content(
-            model=MODEL_NAME,
-            contents=prompt,
-        )
-        text = response.text.strip()
-
-        # Gemini sometimes wraps JSON in markdown fences ```json ... ```
-        if text.startswith("```"):
-            text = text.strip("`")
-            if text.startswith("json"):
-                text = text[4:]
-            text = text.strip()
-
-        result = json.loads(text)
-
-    except Exception as e:
-        print(f"Halal check failed for {symbol}: {e}")
-        result = {
-            "status": "unclear",
-            "confidence score": 0,
-            "reason": "Screening unavailable right now."
-        }
-
-    cache[symbol] = result
-    save_cache(cache)
-
-    return result
 
 
 app = Flask(__name__)
@@ -256,7 +182,7 @@ def gainers():
             and p["quote_currency_id"] == "USD"
             and p["trading_disabled"] == False
             and p["is_disabled"] == False
-            and p["base_currency_id"] not in BLACKLIST
+            and p["base_currency_id"] not in EXCLUDED_SYMBOLS
             and safe_float(p.get("price_percentage_change_24h")) is not None
         ]
 
@@ -279,7 +205,6 @@ def gainers():
                 "price": p["price"],
                 "change_24h": round(float(p["price_percentage_change_24h"]), 2),
                 "volume_24h": round(safe_float(p.get("volume_24h")) or 0, 2),
-                "halal_status": check_halal(symbol, name)
             })
 
         return cleaned
