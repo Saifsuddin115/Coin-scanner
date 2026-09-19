@@ -17,12 +17,11 @@ EXCLUDED_SYMBOLS = {
     # meme coins
     "PUMP", "MOG", "USELESS", "SPX", "BONK", "KEYCAT", "TROLL", "BIRB",
     "CLANKER", "TURBO", "FUN1", "PENGU", "DOGINME", "TRUMP", "BASECAT",
-    # lending / interest-based (riba)
-    "LQTY", "AAVE", "EUL", "KMNO", "UP", "GFI", "MORPHO", "FARM", "WELL", "QI",
+   
     # perpetuals / leveraged derivatives
-    "DRV", "PERP",
+    "DRV", "PERP","DRIFT","UNI","HYPE",
     # yield/staking-as-interest edge cases
-    "JTO", "ONDO", "BLAST", "DRB",
+    "ARB",
     # legacy blacklist from before
     "PIRATE", "THQ",
 }

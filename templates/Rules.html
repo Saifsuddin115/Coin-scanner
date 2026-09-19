@@ -128,7 +128,8 @@ h2,h3,h4,h5,h6,h7 {
 #tradeButtons,
 #confluences,
 #proveHH,
-#proveVolume {
+#proveVolume,
+#proveStructure {
     padding: 20px;
     font-family: 'Playfair Display', serif;
     color: var(--gold);
@@ -153,7 +154,8 @@ h2,h3,h4,h5,h6,h7 {
 #tradeButtons.fade-out,
 #confluences.fade-out,
  #provehh.fade-out,
- #proveVolume.fade-out {
+ #proveVolume.fade-out,
+ #proveStructure.fade-out {
 
     opacity: 0;
 
@@ -451,7 +453,7 @@ h2{
     margin: 5px;
   }
   #question1, #questionBreakout, #Breakout, #breakoutBPR, #questionLTF,
-  #question2, #question3, #question4, #tradeButtons, #confluences, #proveHH, #proveVolume {
+  #question2, #question3, #question4, #tradeButtons, #confluences, #proveHH, #proveVolume, #proveStructure {
     padding: 14px;
     width: min(340px, 94vw);
     transform: translateY(-30px);
@@ -551,6 +553,25 @@ Does the trend have INSANE VOLUME?
   <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
 </svg></button>
 <button type="button" onclick="checkProveVolume('No')">No<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+</div>
+
+<div id="proveStructure" style="display:none">
+    <h2>HyperBull check</h2>
+Has price broken structure? A bearish engulfing or doji?
+<p>
+<button type="button" onclick="checkHyperStructure('Yes')">Yes<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+<button type="button" onclick="checkHyperStructure('No')">No<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
+  <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
+</svg></button>
+<p id="structureResult"></p>
+<button type="button" id="nextStructure" class="next-btn" style="display:none" onclick="goToNext('proveStructure', 'questionBreakout')">Next<svg class="border-draw" viewBox="0 0 100 100" preserveAspectRatio="none">
   <path d="M50,100 L100,100 L100,0 L50,0" vector-effect="non-scaling-stroke" />
   <path d="M50,100 L0,100 L0,0 L50,0" vector-effect="non-scaling-stroke" />
 </svg></button>
@@ -965,6 +986,7 @@ You KNOW if you are lying to yourself, DO NOT LOWER YOURE STANDARDS, not taking 
 <script>
 let lastSetupChoice = null;
 let breakoutExistsChoice = null;
+let hyperStructureBroken = false;
 
     const TC_EXTENSION_ID = "iaobjcihlmogcnmejlkacaohoadmlejh"; // same ID as in your extension
 
@@ -1328,7 +1350,25 @@ function checkProveVolume(choice) {
     }
 
     disableButtons('proveVolume');
-    goToNext('proveVolume', 'questionBreakout');
+    goToNext('proveVolume', 'proveStructure');
+}
+function checkHyperStructure(choice) {
+
+    hyperStructureBroken = (choice === 'Yes');
+
+    const result = document.getElementById('structureResult');
+
+    if (choice === 'Yes') {
+        result.innerHTML = 'Structure broken — target the LOWER WICK instead of the high.';
+    } else {
+        result.innerHTML = 'Structure intact — continue as normal.';
+    }
+
+    revealText(result);
+
+    disableButtons('proveStructure');
+
+    showNextButton('nextStructure', 'proveStructure');
 }
 
 // Fills in the "Trade Details" section on the valid verdict, based on
@@ -1342,9 +1382,10 @@ function setTradeDetails() {
     let aim = '';
 
     if (lastSetupChoice === 'HyperBull') {
-        trendLabel = 'Hyper Bullish (Parabolic)';
-        aim = 'the STRONGEST take-profit target.';
-    } else if (lastSetupChoice === 'Bull') {
+    trendLabel = 'Hyper Bullish (Parabolic)';
+    aim = hyperStructureBroken ? 'the LOWEST wick.' : 'the STRONGEST take-profit target.';
+}
+     else if (lastSetupChoice === 'Bull') {
         trendLabel = 'Bullish (Higher highs)';
         aim = 'the CLOSEST take-profit target.';
     } else if (lastSetupChoice === 'Consolidation') {
