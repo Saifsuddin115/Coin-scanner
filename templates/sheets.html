@@ -19,16 +19,16 @@
     --bg: #0a0e17;
     --surface: #131a2c;
     --surface-2: #182137;
-    --surface-border: #2a3349;   /* was: --border */
+    --surface-border: #2a3349;   
 
     --gold: #c9a227;
     --gold-bright: #e0c158;
 
     --text: #ece7da;
-    --text-muted: #8891a8;       /* was: --muted */
+    --text-muted: #8891a8;       
 
-    --valid: #3f8f6f;            /* was: --green */
-    --invalid: #804439;          /* was: --red */
+    --valid: #3f8f6f;            
+    --invalid: #804439;         
 }
 
         * { box-sizing: border-box; }
@@ -150,7 +150,7 @@ body {
 
         .table-wrap { width: 100%; overflow-x: auto; }
 
-        .trade-table { width: 100%; border-collapse: collapse; min-width: 1050px; }
+        .trade-table { width: 100%; border-collapse: collapse; min-width: 1180px; }
 
         .trade-table th {
             padding: 12px 14px;
@@ -415,6 +415,157 @@ body {
     text-align: left;
 }
 
+/* =========================================================
+   FOLDERS (folder-list home screen)
+========================================================= */
+
+.hidden { display: none !important; }
+
+.folder-table tbody tr { cursor: pointer; }
+.folder-table tbody tr:hover { background: rgba(201, 162, 39, 0.10); }
+.folder-table td:first-child { font-weight: 700; color: var(--gold-bright); font-family: 'Playfair Display', serif; letter-spacing: 0.3px; }
+.folder-table .folder-count-cell { color: var(--text-muted); font-family: 'Inter', sans-serif; }
+.folder-table td:last-child { text-align: right; }
+#folderListView .table-card { min-height: 340px; }
+.folder-table .folder-row-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 12px;
+    box-shadow: none !important;
+    transform: none !important;
+}
+.folder-table .folder-row-delete:hover {
+    color: #c57b70;
+    background: rgba(128, 68, 57, 0.15);
+    transform: none;
+    box-shadow: none;
+}
+
+.row-folder-select {
+    width: 100%;
+    min-height: 30px !important;
+    padding: 5px 6px !important;
+    font-size: 11px !important;
+    border-radius: 6px !important;
+}
+
+dialog#folderModal {
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(201, 162, 39, 0.12);
+    padding: 28px;
+    border-radius: 16px;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    max-width: 380px;
+    width: 90vw;
+}
+dialog#folderModal[open] { animation: fadeIn 0.3s ease; }
+dialog#folderModal::backdrop {
+    background: rgba(8, 10, 16, 0.92);
+    backdrop-filter: blur(4px);
+}
+dialog#folderModal h3 {
+    color: var(--gold);
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    margin: 0 0 18px;
+}
+#folderNameInput {
+    width: 100%;
+    min-height: 40px;
+    padding: 9px 12px;
+    border: 1px solid var(--surface-border);
+    border-radius: 9px;
+    background: #10172a;
+    color: var(--text);
+    outline: none;
+    font-size: 13px;
+    margin-bottom: 18px;
+}
+#folderNameInput:focus {
+    border-color: rgba(201, 162, 39, 0.65);
+    box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.07);
+}
+
+.row-folder-add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 1px dashed var(--surface-border);
+    border-radius: 7px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1;
+    box-shadow: none !important;
+    transform: none !important;
+}
+.row-folder-add:hover {
+    border-color: var(--gold);
+    color: var(--gold-bright);
+    background: rgba(201, 162, 39, 0.08);
+    transform: none;
+    box-shadow: none;
+}
+
+dialog#moveToFolderModal {
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(201, 162, 39, 0.12);
+    padding: 28px;
+    border-radius: 16px;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    max-width: 380px;
+    width: 90vw;
+}
+dialog#moveToFolderModal[open] { animation: fadeIn 0.3s ease; }
+dialog#moveToFolderModal::backdrop {
+    background: rgba(8, 10, 16, 0.92);
+    backdrop-filter: blur(4px);
+}
+dialog#moveToFolderModal h3 {
+    color: var(--gold);
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    margin: 0 0 18px;
+}
+.move-folder-list {
+    max-height: 260px;
+    overflow-y: auto;
+    text-align: left;
+    margin-bottom: 18px;
+}
+.move-folder-option {
+    padding: 10px 12px;
+    border: 1px solid var(--surface-border);
+    border-radius: 9px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+.move-folder-option:hover { border-color: var(--gold); background: rgba(201, 162, 39, 0.08); }
+.move-folder-option.selected { border-color: var(--gold); background: rgba(201, 162, 39, 0.14); color: var(--gold-bright); font-weight: 600; }
+.move-folder-option.no-folder-option { color: var(--text-muted); }
+.move-folder-option.no-folder-option.selected { color: var(--gold-bright); }
+
        /* ── Menu button ───────────────────────────────────────── */
 
 #menuBtn {
@@ -567,8 +718,9 @@ dialog#deleteConfirmModal h3 {
 }
 .modal-buttons button {
     width: auto;
-    padding: 17px 40px;
+    padding: 10px 40px;
     margin: 0;
+    font-family: 'Inter', sans-serif;
 }
 .danger-btn {
     color: var(--gold) !important;
@@ -577,6 +729,37 @@ dialog#deleteConfirmModal h3 {
     from { opacity: 0; }
     to   { opacity: 1; }
 }
+dialog#deleteFolderModal {
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(128, 68, 57, 0.18);
+    padding: 32px;
+    border-radius: 16px;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    max-width: 380px;
+    width: 90vw;
+}
+dialog#deleteFolderModal[open] { animation: fadeIn 0.3s ease; }
+dialog#deleteFolderModal::backdrop {
+    background: rgba(8, 10, 16, 0.92);
+    backdrop-filter: blur(4px);
+}
+dialog#deleteFolderModal h3 {
+    color: var(--gold);
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    margin: 0 0 12px;
+}
+dialog#deleteFolderModal p {
+    color: var(--text-muted);
+    font-size: 12.5px;
+    margin: 0 0 22px;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+}
+
 
     </style>
 
@@ -603,11 +786,46 @@ dialog#deleteConfirmModal h3 {
 
     <main class="journal-app">
 
-        <section id="tradeList">
+                <section id="folderListView">
 
             <div class="journal-header">
                 <div class="title-block">
                     <h1>Trade Journal</h1>
+                    <p>Organize your trades into folders.</p>
+                </div>
+
+                <button id="newFolderBtn" class="new-trade-btn" type="button">+ New Folder</button>
+            </div>
+
+            <div class="table-card">
+                <div class="table-wrap">
+                    <table class="trade-table folder-table">
+                        <thead>
+                            <tr>
+                                <th>Folder</th>
+                                <th>Trades</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="folderTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div id="folderEmptyState" class="empty-state" style="display:none;">
+                    <h3>No folders yet</h3>
+                    <p>Create a folder to start organizing your trades.</p>
+                    <button id="emptyNewFolderBtn" class="new-trade-btn" type="button">+ Create Your First Folder</button>
+                </div>
+            </div>
+
+        </section>
+
+        <section id="tradeList" class="hidden">
+
+            <div class="journal-header">
+                <button id="backToFoldersBtn" class="back-btn" type="button" style="align-self:center;">← Back to Folders</button>
+                <div class="title-block">
+                    <h1 id="folderViewTitle">Trade Journal</h1>
                     <p>Record, review, and learn from every trade.</p>
                 </div>
 
@@ -651,6 +869,7 @@ dialog#deleteConfirmModal h3 {
                                 <th>Rules</th>
                                 <th>Confluences</th>
                                 <th>Lesson</th>
+                                <th>Folder</th>
                             </tr>
 
                             
@@ -756,6 +975,13 @@ dialog#deleteConfirmModal h3 {
                             </div>
                         </div>
 
+                        <div class="field">
+                            <label for="tradeFolder">Folder</label>
+                            <select id="tradeFolder">
+                                <option value="">No Folder</option>
+                            </select>
+                        </div>
+
                     </div>
                 </div>
 
@@ -822,6 +1048,34 @@ dialog#deleteConfirmModal h3 {
 </dialog>
         </section>
 
+    <dialog id="folderModal">
+        <h3>New Folder</h3>
+        <input id="folderNameInput" type="text" placeholder="Folder name" maxlength="40" autocomplete="off">
+        <div class="modal-buttons">
+            <button type="button" id="confirmFolderCreate">Create</button>
+            <button type="button" id="confirmFolderCancel">Cancel</button>
+        </div>
+    </dialog>
+
+       <dialog id="deleteFolderModal">
+        <h3>Delete this folder?</h3>
+        <p>Trades inside it won't be deleted — they'll just be unassigned.</p>
+        <div class="modal-buttons">
+            <button type="button" id="confirmDeleteFolderYes" class="danger-btn">Delete</button>
+            <button type="button" id="confirmDeleteFolderNo">Cancel</button>
+        </div>
+    </dialog>
+
+    <dialog id="moveToFolderModal">
+        <h3>Move Trade to Folder</h3>
+        <div id="moveToFolderList" class="move-folder-list"></div>
+        <div class="modal-buttons">
+            <button type="button" id="confirmMoveToFolder">Move</button>
+            <button type="button" id="cancelMoveToFolder">Cancel</button>
+        </div>
+    </dialog>
+   
+
     </main>
 
     <script>
@@ -877,6 +1131,7 @@ dialog#deleteConfirmModal h3 {
         const tradeWhatHappened = document.getElementById("tradeWhatHappened");
         const tradeBetter = document.getElementById("tradeBetter");
         const tradeLesson = document.getElementById("tradeLesson");
+        const tradeFolder = document.getElementById("tradeFolder");
 
         const rulesYesBtn = document.getElementById("rulesYesBtn");
         const rulesNoBtn = document.getElementById("rulesNoBtn");
@@ -928,6 +1183,255 @@ dialog#deleteConfirmModal h3 {
 
        
 
+                /* ========================= FOLDERS ========================= */
+
+        const FOLDERS_KEY = "tc_journal_folders";
+        const FOLDER_MAP_KEY = "tc_journal_trade_folder_map";
+        const MIGRATION_FLAG_KEY = "tc_journal_default_folder_done";
+
+        let folders = [];              // [{ id, name }]
+        let tradeFolderMap = {};       // { tradeId: folderId }
+        let currentOpenFolderId = null; // id of the folder currently being viewed, or "none" for uncategorized
+        let pendingFolderDeleteId = null;
+
+        const folderListView = document.getElementById("folderListView");
+        const folderTableBody = document.getElementById("folderTableBody");
+        const folderEmptyState = document.getElementById("folderEmptyState");
+        const folderViewTitle = document.getElementById("folderViewTitle");
+
+        function loadFolders() {
+            try {
+                folders = JSON.parse(localStorage.getItem(FOLDERS_KEY)) || [];
+            } catch (error) {
+                folders = [];
+            }
+            try {
+                tradeFolderMap = JSON.parse(localStorage.getItem(FOLDER_MAP_KEY)) || {};
+            } catch (error) {
+                tradeFolderMap = {};
+            }
+        }
+
+        function saveFolders() {
+            try {
+                localStorage.setItem(FOLDERS_KEY, JSON.stringify(folders));
+            } catch (error) {
+                console.error("Failed to save folders:", error);
+            }
+        }
+
+        function saveFolderMap() {
+            try {
+                localStorage.setItem(FOLDER_MAP_KEY, JSON.stringify(tradeFolderMap));
+            } catch (error) {
+                console.error("Failed to save folder assignments:", error);
+            }
+        }
+
+        // One-time migration: if this is the first time folders exist and there are
+        // already trades on the books, group them all into a "100 Trades" folder
+        // instead of leaving them invisible/uncategorized.
+        function migrateDefaultFolder() {
+            if (localStorage.getItem(MIGRATION_FLAG_KEY)) return;
+            if (folders.length === 0 && trades.length > 0) {
+                const defaultFolder = { id: createId(), name: "100 Trades" };
+                folders.push(defaultFolder);
+                trades.forEach(t => { tradeFolderMap[t.id] = defaultFolder.id; });
+                saveFolders();
+                saveFolderMap();
+            }
+            localStorage.setItem(MIGRATION_FLAG_KEY, "1");
+        }
+
+        function assignTradeToFolder(tradeId, folderId) {
+            if (folderId) {
+                tradeFolderMap[tradeId] = folderId;
+            } else {
+                delete tradeFolderMap[tradeId];
+            }
+            saveFolderMap();
+        }
+
+        function folderTradeCount(folderId) {
+            return Object.values(tradeFolderMap).filter(id => id === folderId).length;
+        }
+
+        function uncategorizedCount() {
+            return trades.filter(t => {
+                const fid = tradeFolderMap[t.id];
+                return !fid || !folders.some(f => f.id === fid);
+            }).length;
+        }
+
+        function createFolder(name) {
+            const trimmed = name.trim();
+            if (!trimmed) return;
+            folders.push({ id: createId(), name: trimmed });
+            saveFolders();
+            renderFolderListView();
+        }
+
+        function deleteFolder(folderId) {
+            folders = folders.filter(f => f.id !== folderId);
+            saveFolders();
+            Object.keys(tradeFolderMap).forEach(tradeId => {
+                if (tradeFolderMap[tradeId] === folderId) delete tradeFolderMap[tradeId];
+            });
+            saveFolderMap();
+            renderFolderListView();
+        }
+
+        function populateFolderSelect(selectEl, selectedId) {
+            selectEl.innerHTML = `<option value="">No Folder</option>` +
+                folders.map(f => `<option value="${f.id}">${escapeHTML(f.name)}</option>`).join("");
+            selectEl.value = selectedId && folders.some(f => f.id === selectedId) ? selectedId : "";
+        }
+
+        function openFolder(folderId, folderName) {
+            currentOpenFolderId = folderId;
+            folderViewTitle.textContent = folderName;
+            folderListView.classList.add("hidden");
+            tradeList.classList.remove("hidden");
+            currentPage = 1;
+            renderTrades();
+        }
+
+        function backToFolders() {
+            tradeList.classList.add("hidden");
+            folderListView.classList.remove("hidden");
+            renderFolderListView();
+        }
+
+        function renderFolderListView() {
+            folderTableBody.innerHTML = "";
+
+            const uncatCount = uncategorizedCount();
+            const hasAnyRows = folders.length > 0 || uncatCount > 0;
+
+            folderEmptyState.style.display = hasAnyRows ? "none" : "block";
+            folderTableBody.parentElement.parentElement.style.display = hasAnyRows ? "" : "none";
+
+            if (!hasAnyRows) return;
+
+            folders.forEach(folder => {
+                folderTableBody.appendChild(makeFolderRow(folder.id, folder.name, folderTradeCount(folder.id), true));
+            });
+
+            if (uncatCount > 0) {
+                folderTableBody.appendChild(makeFolderRow("none", "Uncategorized", uncatCount, false));
+            }
+        }
+
+        function makeFolderRow(folderId, name, count, deletable) {
+            const row = document.createElement("tr");
+            if (!deletable) row.classList.add("uncategorized-row");
+
+            row.innerHTML = `
+                <td>${escapeHTML(name)}</td>
+                <td class="folder-count-cell">${count} trade${count === 1 ? "" : "s"}</td>
+                <td></td>
+            `;
+
+            const actionCell = row.lastElementChild;
+            if (deletable) {
+                const delBtn = document.createElement("button");
+                delBtn.type = "button";
+                delBtn.className = "folder-row-delete";
+                delBtn.title = "Delete folder";
+                delBtn.textContent = "✕";
+                delBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    pendingFolderDeleteId = folderId;
+                    deleteFolderModal.showModal();
+                });
+                actionCell.appendChild(delBtn);
+            }
+
+            row.addEventListener("dblclick", () => openFolder(folderId, name));
+            return row;
+        }
+
+        const folderModal = document.getElementById("folderModal");
+        function openNewFolderModal() {
+            document.getElementById("folderNameInput").value = "";
+            folderModal.showModal();
+            document.getElementById("folderNameInput").focus();
+        }
+        document.getElementById("newFolderBtn").addEventListener("click", openNewFolderModal);
+        document.getElementById("emptyNewFolderBtn").addEventListener("click", openNewFolderModal);
+
+        document.getElementById("confirmFolderCreate").addEventListener("click", () => {
+            const name = document.getElementById("folderNameInput").value;
+            if (name.trim()) {
+                createFolder(name);
+                folderModal.close();
+            }
+        });
+        document.getElementById("confirmFolderCancel").addEventListener("click", () => folderModal.close());
+        document.getElementById("folderNameInput").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                document.getElementById("confirmFolderCreate").click();
+            }
+        });
+
+        const deleteFolderModal = document.getElementById("deleteFolderModal");
+        document.getElementById("confirmDeleteFolderYes").addEventListener("click", () => {
+            deleteFolderModal.close();
+            if (pendingFolderDeleteId) deleteFolder(pendingFolderDeleteId);
+            pendingFolderDeleteId = null;
+        });
+        document.getElementById("confirmDeleteFolderNo").addEventListener("click", () => {
+            deleteFolderModal.close();
+            pendingFolderDeleteId = null;
+        });
+
+        document.getElementById("backToFoldersBtn").addEventListener("click", backToFolders);
+
+               let pendingMoveTradeId = null;
+        let selectedMoveFolderValue = undefined; // undefined = nothing picked yet, null = "No Folder", else a folder id
+        const moveToFolderModal = document.getElementById("moveToFolderModal");
+        const moveToFolderList = document.getElementById("moveToFolderList");
+
+        function selectMoveFolderOption(el, value) {
+            selectedMoveFolderValue = value;
+            moveToFolderList.querySelectorAll(".move-folder-option").forEach(opt => opt.classList.remove("selected"));
+            el.classList.add("selected");
+        }
+
+        function openMoveToFolderModal(tradeId) {
+            pendingMoveTradeId = tradeId;
+            selectedMoveFolderValue = undefined;
+            moveToFolderList.innerHTML = "";
+
+            const noneOption = document.createElement("div");
+            noneOption.className = "move-folder-option no-folder-option";
+            noneOption.textContent = "No Folder";
+            noneOption.addEventListener("click", () => selectMoveFolderOption(noneOption, null));
+            moveToFolderList.appendChild(noneOption);
+
+            folders.forEach(folder => {
+                const option = document.createElement("div");
+                option.className = "move-folder-option";
+                option.textContent = folder.name;
+                option.addEventListener("click", () => selectMoveFolderOption(option, folder.id));
+                moveToFolderList.appendChild(option);
+            });
+
+            moveToFolderModal.showModal();
+        }
+
+        document.getElementById("confirmMoveToFolder").addEventListener("click", () => {
+            if (selectedMoveFolderValue === undefined) return;
+            assignTradeToFolder(pendingMoveTradeId, selectedMoveFolderValue);
+            moveToFolderModal.close();
+            renderTrades();
+        });
+
+        document.getElementById("cancelMoveToFolder").addEventListener("click", () => {
+            moveToFolderModal.close();
+            pendingMoveTradeId = null;
+        });
         /* ========================= HELPERS ========================= */
 
         function getLocalDateInputValue() {
@@ -1128,7 +1632,10 @@ function renderPagination(totalPages) {
                    const matchesConfluence = selectedConfluenceFilters.size === 0 ||
       [...selectedConfluenceFilters].some(id => (trade.confluences || []).includes(id));
 
-                    return matchesSearch && matchesResult && matchesDirection && matchesConfluence;
+                                       const tradeFolderId = folders.some(f => f.id === tradeFolderMap[trade.id]) ? tradeFolderMap[trade.id] : null;
+                    const matchesFolder = currentOpenFolderId === "none" ? !tradeFolderId : tradeFolderId === currentOpenFolderId;
+
+                    return matchesSearch && matchesResult && matchesDirection && matchesConfluence && matchesFolder;
                 })
                 .sort((a, b) => {
                     const dateA = new Date(a.date || 0).getTime();
@@ -1138,7 +1645,6 @@ function renderPagination(totalPages) {
                 });
 
                 const PAGE_SIZE = 15;
-currentPage = 1;
 const totalPages = Math.max(1, Math.ceil(filteredTrades.length / PAGE_SIZE));
 currentPage = Math.min(currentPage, totalPages);
 const start = (currentPage - 1) * PAGE_SIZE;
@@ -1168,6 +1674,9 @@ const pageTrades = filteredTrades.slice(start, start + PAGE_SIZE);
             pageTrades.forEach(trade => {
                 const row = document.createElement("tr");
                 row.dataset.id = trade.id;
+            
+
+                const assignedFolderId = folders.some(f => f.id === tradeFolderMap[trade.id]) ? tradeFolderMap[trade.id] : "";
 
                 row.innerHTML = `
                     <td>${escapeHTML(trade.date || "—")}</td>
@@ -1178,9 +1687,23 @@ const pageTrades = filteredTrades.slice(start, start + PAGE_SIZE);
                     <td class="${trade.rules === "yes" ? "rules-yes" : "rules-no"}">${trade.rules === "yes" ? "Yes" : "No"}</td>
                     <td class="confluence-cell" title="${escapeHTML((trade.confluences || []).map(id => confluenceLabels[id] || id).join(", "))}">${confluenceCellHTML(trade.confluences)}</td>
                     <td class="reason-cell" title="${escapeHTML(trade.lesson || "")}">${escapeHTML(trade.lesson || "—")}</td>
+                    <td></td>
                 `;
 
+                                const folderCell = row.lastElementChild;
+                const addFolderBtn = document.createElement("button");
+                addFolderBtn.type = "button";
+                addFolderBtn.className = "row-folder-add";
+                addFolderBtn.title = assignedFolderId ? "Move to a different folder" : "Add to a folder";
+                addFolderBtn.textContent = "+";
+                addFolderBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    openMoveToFolderModal(trade.id);
+                });
+                folderCell.appendChild(addFolderBtn);
+
                 row.addEventListener("click", () => openTrade(trade.id));
+
                 tradeTableBody.appendChild(row);
             });
             renderPagination(totalPages)
@@ -1211,6 +1734,7 @@ const pageTrades = filteredTrades.slice(start, start + PAGE_SIZE);
                 if (checkbox) checkbox.checked = false;
             });
 
+populateFolderSelect(tradeFolder, currentOpenFolderId && currentOpenFolderId !== "none" ? currentOpenFolderId : "");
             deleteTradeBtn.style.display = "none";
             showEditor();
         }
@@ -1254,6 +1778,9 @@ const pageTrades = filteredTrades.slice(start, start + PAGE_SIZE);
                 const checkbox = document.getElementById(id);
                 if (checkbox) checkbox.checked = savedConfluences.includes(id);
             });
+
+            const assignedFolderId = folders.some(f => f.id === tradeFolderMap[trade.id]) ? tradeFolderMap[trade.id] : "";
+            populateFolderSelect(tradeFolder, assignedFolderId);
 
             deleteTradeBtn.style.display = "inline-block";
             showEditor();
@@ -1336,6 +1863,9 @@ document.addEventListener("click", e => {
 
     if (!res.ok) { alert("Failed to save trade."); return; }
 
+    const savedTradeId = editingTradeId || (await res.json().catch(() => null))?.id;
+    if (savedTradeId) assignTradeToFolder(savedTradeId, tradeFolder.value || null);
+
     await loadTrades();
     showTradeList();
 });
@@ -1358,6 +1888,7 @@ document.addEventListener("click", e => {
             if (!editingTradeId) return;
 
             await fetch(`/api/trades/${editingTradeId}`, { method: "DELETE" });
+            assignTradeToFolder(editingTradeId, null);
             editingTradeId = null;
             await loadTrades();
             showTradeList();
@@ -1377,10 +1908,11 @@ document.addEventListener("click", e => {
 
         /* ========================= INIT ========================= */
 
-        loadTrades();
         (async function init() {
+    loadFolders();
     await loadTrades();
-    renderTrades();
+    migrateDefaultFolder();
+    renderFolderListView();
 })();
 
     </script>
