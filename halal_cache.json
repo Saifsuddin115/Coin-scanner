@@ -1,0 +1,146 @@
+{
+  "QI": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "POND": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "FARM": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "DRB": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "EDGE": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "MPLX": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "VARA": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "PNG": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "AERO": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "SEI": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "ENA": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "GRASS": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "VELO": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "CTX": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "RARE": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "SUI": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "JTO": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "WLD": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "BNKR": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "B3": {
+    "status": "unclear",
+    "reason": "Classification unavailable right now."
+  },
+  "SPK": {
+    "status": "unclear",
+    "reason": "SPK is a modular infrastructure token with varying implementations, and its compliance depends on whether specific projects built on it involve interest-based lending or prohibited speculative activities."
+  },
+  "BLZ": {
+    "status": "unclear",
+    "reason": "While it functions as a decentralized storage network, its staking model involves interest-like rewards and the token is frequently used for high-leverage speculative trading."
+  },
+  "AMP": {
+    "status": "halal",
+    "reason": "AMP functions as a collateral token for decentralized payments and lacks inherent gambling, interest-based lending, or derivative structures."
+  },
+  "2Z": {
+    "status": "unclear",
+    "reason": "The project lacks transparent documentation regarding its utility and revenue model, making it difficult to assess compliance with Shariah financial principles."
+  },
+  "SPELL": {
+    "status": "unclear",
+    "reason": "The token is primarily used for governance and yield farming protocols involving interest-based staking, which necessitates individual scrutiny of specific protocol operations."
+  },
+  "QNT": {
+    "status": "halal",
+    "reason": "Quant (QNT) provides utility through its Overledger technology for blockchain interoperability and does not inherently rely on interest-based lending, gambling, or prohibited derivative speculation."
+  },
+  "OPG": {
+    "status": "unclear",
+    "reason": "OpenGradient is a modular Layer 1 platform currently in development, and detailed documentation on its underlying economic model, staking mechanisms, and governance utility is insufficient for a final Shariah ruling."
+  },
+  "KAIO": {
+    "status": "unclear",
+    "reason": "The project lacks transparent technical documentation and a clear utility model to confirm its compliance with Islamic financial principles."
+  },
+  "KMNO": {
+    "status": "unclear",
+    "reason": "Kamino functions as a decentralized lending and yield-aggregation platform, which involves interest-based (riba) transactions that conflict with Shariah principles."
+  },
+  "TNSR": {
+    "status": "unclear",
+    "reason": "Tensor serves as a governance token for an NFT marketplace, but the underlying nature of NFT speculation and royalty structures requires further expert Shariah review regarding potential elements of uncertainty (gharar)."
+  },
+  "AWE": {
+    "status": "unclear",
+    "reason": "Awe (AWE) is a low-cap project with limited publicly verifiable information regarding its underlying utility and smart contract architecture to confirm Shariah compliance."
+  },
+  "EIGEN": {
+    "status": "unclear",
+    "reason": "While the project focuses on decentralized cloud infrastructure, the integration of staking and potential yield mechanisms requires further granular analysis of contract-level interest structures."
+  },
+  "PYTH": {
+    "status": "halal",
+    "reason": "Pyth Network provides decentralized price oracle utility for financial data without engaging in interest, gambling, or prohibited derivative speculation."
+  },
+  "AVNT": {
+    "status": "unclear",
+    "reason": "Veranta operates as a highly speculative, low-liquidity token with limited publicly verifiable utility, making its alignment with Shariah-compliant investment principles difficult to determine."
+  },
+  "DASH": {
+    "status": "halal",
+    "reason": "Dash serves as a decentralized payment network with a proof-of-work/proof-of-service architecture where rewards compensate participants for providing network security and transaction processing rather than interest on debt."
+  },
+  "SHPING": {
+    "status": "halal",
+    "reason": "Shping acts as a loyalty and rewards utility token for a retail data platform, and its reward mechanisms are based on marketing and consumer participation rather than interest-bearing financial services."
+  }
+}

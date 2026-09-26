@@ -387,7 +387,9 @@ async function loadSparkline(symbol) {
         console.log('Sparkline error:', symbol, e);
     }
 }
-
+function escapeAttr(str) {
+    return String(str || '').replace(/"/g, '&quot;');
+}
 
 function renderCoins(data) {
     const container = document.getElementById("gainers-list");
@@ -416,6 +418,8 @@ function renderCoins(data) {
             <div class="coin-info">
                 <p class="symbol">
     ${coin.symbol}
+        <span class="status-dot status-${coin.halal_status}" data-tooltip="${escapeAttr(coin.halal_reason)}"></span>
+
 </p>
                 <p class="name">${coin.name}</p>
                 ${coin.volume_24h !== undefined
