@@ -575,7 +575,7 @@ def gainers():
 
 
 # ─────────────────────────────────────────────────────────────
-# Gainer alerts via ntfy.sh (free push notifications to your phone)
+# Gainer alerts via Telegram (free push notifications to your phone)
 # ─────────────────────────────────────────────────────────────
 
 ALERT_THRESHOLDS = [15, 20, 25, 30, 40]  # percent (24h change) — edit freely
@@ -592,32 +592,25 @@ def check_cron_key():
     if not expected or not secrets.compare_digest(provided, expected):
         abort(401)
 
-def ntfy_headers(title):
-    headers = {"Title": title, "Priority": "high", "Tags": "rocket"}
-    token = os.environ.get("NTFY_TOKEN")
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
-    return headers
 
 def notify(title, body):
-    """Send one push through ntfy. Returns True on success."""
-    topic = os.environ.get("NTFY_TOPIC")
-    if not topic:
-        print("NTFY_TOPIC is not set")
+    """Send one Telegram message. Returns True on success."""
+    token = os.environ.get("TELEGRAM_BOT_TOKEN")
+    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        print("TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is not set")
         return False
     try:
         r = requests.post(
-            f"https://ntfy.sh/{topic}",
-            data=body.encode("utf-8"),
-            headers=ntfy_headers(title),
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={"chat_id": chat_id, "text": f"🚀 {title}\n{body}"},
             timeout=REQUEST_TIMEOUT
         )
         if not r.ok:
-            print(f"ntfy rejected the message: {r.status_code} {r.text[:200]} "
-                  f"(token sent: {bool(os.environ.get('NTFY_TOKEN'))})")
+            print(f"Telegram rejected the message: {r.status_code} {r.text[:200]}")
         return r.ok
     except Exception as e:
-        print(f"ntfy send failed: {e}")
+        print(f"Telegram send failed: {e}")
         return False
 
 
