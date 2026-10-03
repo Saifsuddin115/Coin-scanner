@@ -545,6 +545,12 @@ def check_cron_key():
     if not expected or not secrets.compare_digest(provided, expected):
         abort(401)
 
+def ntfy_headers(title):
+    headers = {"Title": title, "Priority": "high", "Tags": "rocket"}
+    token = os.environ.get("NTFY_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
 
 def notify(title, body):
     """Send one push through ntfy. Returns True on success."""
@@ -556,7 +562,7 @@ def notify(title, body):
         r = requests.post(
             f"https://ntfy.sh/{topic}",
             data=body.encode("utf-8"),
-            headers={"Title": title, "Priority": "high", "Tags": "rocket"},
+            headers=ntfy_headers(title),
             timeout=REQUEST_TIMEOUT
         )
         if not r.ok:
