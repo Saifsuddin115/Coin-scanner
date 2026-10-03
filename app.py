@@ -1,9 +1,10 @@
 from dotenv import load_dotenv
 load_dotenv()
 import os
+import secrets
 from functools import wraps
-from datetime import datetime
-from flask import Flask, request, jsonify, session, redirect, render_template
+from datetime import datetime, timezone
+from flask import Flask, request, jsonify, session, redirect, render_template, abort
 import requests
 from models import db, Trade, MonthlySummary
 import json
@@ -467,33 +468,40 @@ def sparkline(symbol):
         print(f"Sparkline fetch failed for {symbol}: {e}")
         return {"symbol": symbol, "closes": []}
 
+
+def fetch_top_gainers(limit=20):
+    """Raw Coinbase top gainers (filtered + sorted). No halal/Gemini calls.
+    Raises on network/parse errors — callers decide how to handle that."""
+    response = requests.get(
+        "https://api.coinbase.com/api/v3/brokerage/market/products",
+        timeout=REQUEST_TIMEOUT
+    )
+    data = response.json()
+    products = data["products"]
+
+    filtered = [
+        p for p in products
+        if p["product_type"] == "SPOT"
+        and p["quote_currency_id"] == "USD"
+        and p["trading_disabled"] == False
+        and p["is_disabled"] == False
+        and p["base_currency_id"] not in EXCLUDED_SYMBOLS
+        and safe_float(p.get("price_percentage_change_24h")) is not None
+    ]
+
+    sorted_products = sorted(
+        filtered,
+        key=lambda p: float(p["price_percentage_change_24h"]),
+        reverse=True
+    )
+
+    return sorted_products[:limit]
+
+
 @app.route("/api/gainers")
 def gainers():
     try:
-        response = requests.get(
-            "https://api.coinbase.com/api/v3/brokerage/market/products",
-            timeout=REQUEST_TIMEOUT
-        )
-        data = response.json()
-        products = data["products"]
-
-        filtered = [
-            p for p in products
-            if p["product_type"] == "SPOT"
-            and p["quote_currency_id"] == "USD"
-            and p["trading_disabled"] == False
-            and p["is_disabled"] == False
-            and p["base_currency_id"] not in EXCLUDED_SYMBOLS
-            and safe_float(p.get("price_percentage_change_24h")) is not None
-        ]
-
-        sorted_products = sorted(
-            filtered,
-            key=lambda p: float(p["price_percentage_change_24h"]),
-            reverse=True
-        )
-
-        top_20 = sorted_products[:20]
+        top_20 = fetch_top_gainers(20)
         cleaned = []
 
         for p in top_20:
@@ -517,6 +525,87 @@ def gainers():
     except Exception as e:
         print(f"Gainers fetch failed: {e}")
         return []
+
+
+# ─────────────────────────────────────────────────────────────
+# Gainer alerts via ntfy.sh (free push notifications to your phone)
+# ─────────────────────────────────────────────────────────────
+
+ALERT_THRESHOLDS = [15, 20, 25, 30, 40]  # percent (24h change) — edit freely
+
+# Remembers the highest level already alerted per coin per day: {(symbol, date): level}
+# Lives in RAM, so a restart can cause one repeat alert. Keep gunicorn on 1 worker.
+ALERTED = {}
+
+
+def check_cron_key():
+    """Aborts with 401 unless ?key= matches the CRON_SECRET env var."""
+    expected = os.environ.get("CRON_SECRET")
+    provided = request.args.get("key", "")
+    if not expected or not secrets.compare_digest(provided, expected):
+        abort(401)
+
+
+def notify(title, body):
+    """Send one push through ntfy. Returns True on success."""
+    topic = os.environ.get("NTFY_TOPIC")
+    if not topic:
+        print("NTFY_TOPIC is not set")
+        return False
+    try:
+        r = requests.post(
+            f"https://ntfy.sh/{topic}",
+            data=body.encode("utf-8"),
+            headers={"Title": title, "Priority": "high", "Tags": "rocket"},
+            timeout=REQUEST_TIMEOUT
+        )
+        return r.ok
+    except Exception as e:
+        print(f"ntfy send failed: {e}")
+        return False
+
+
+@app.route("/api/test-notify")
+def test_notify():
+    check_cron_key()
+    ok = notify("TC test", "If you see this, alerts work")
+    return jsonify({"sent": ok})
+
+
+@app.route("/api/cron/check")
+def cron_check():
+    check_cron_key()
+
+    try:
+        top = fetch_top_gainers(20)
+    except Exception as e:
+        print(f"Alert check: gainers fetch failed: {e}")
+        return jsonify({"error": "gainers fetch failed"}), 502
+
+    today = datetime.now(timezone.utc).date()
+
+    # forget yesterday's alerts
+    for key in [k for k in ALERTED if k[1] != today]:
+        del ALERTED[key]
+
+    sent = 0
+    for p in top:
+        symbol = p["base_currency_id"]
+        pct = float(p["price_percentage_change_24h"])
+
+        passed = [t for t in ALERT_THRESHOLDS if pct >= t]
+        if not passed:
+            continue
+        level = max(passed)
+
+        if ALERTED.get((symbol, today), 0) >= level:
+            continue  # already alerted at this level (or higher) today
+
+        if notify(f"{symbol} passed {level}%", f"{symbol} is up {pct:.1f}% in 24h"):
+            ALERTED[(symbol, today)] = level
+            sent += 1
+
+    return jsonify({"alerts_sent": sent, "checked": len(top)})
 
 
 if __name__ == "__main__":
