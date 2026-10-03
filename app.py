@@ -325,8 +325,9 @@ Respond ONLY with valid JSON in exactly this format:
             "reason": "Classification unavailable right now."
         }
 
-    HALAL_CACHE[symbol] = result
-    save_halal_cache(HALAL_CACHE)
+    if result.get("reason") != "Classification unavailable right now.":
+        HALAL_CACHE[symbol] = result
+        save_halal_cache(HALAL_CACHE)
     return result
 
 
