@@ -559,6 +559,8 @@ def notify(title, body):
             headers={"Title": title, "Priority": "high", "Tags": "rocket"},
             timeout=REQUEST_TIMEOUT
         )
+        if not r.ok:
+            print(f"ntfy rejected the message: {r.status_code} {r.text[:200]}")
         return r.ok
     except Exception as e:
         print(f"ntfy send failed: {e}")
