@@ -25,7 +25,7 @@ EXCLUDED_SYMBOLS = {
     # perpetuals / leveraged derivatives
     "DRV", "PERP","DRIFT","HYPE",
     # yield/staking-as-interest edge cases
-    "ARB","DRB", "CTX","VELO", "KAIO","WLD","QI","ATH","RAY","YFI",
+    "ARB","DRB", "CTX","VELO", "KAIO","WLD","QI","ATH","RAY","YFI","SYRUP","UP",
     # legacy blacklist from before
     "PIRATE", "THQ",
 }
