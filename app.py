@@ -578,7 +578,7 @@ def gainers():
 # Gainer alerts via Telegram (free push notifications to your phone)
 # ─────────────────────────────────────────────────────────────
 
-ALERT_THRESHOLDS = [15, 20, 25, 30, 40]  # percent (24h change) — edit freely
+ALERT_THRESHOLDS = [15, 20, 25, 30, 40] + list(range(50, 105, 5))  # 50, 55, ... 100
 
 # Remembers the highest level already alerted per coin per day: {(symbol, date): level}
 # Lives in RAM, so a restart can cause one repeat alert. Keep gunicorn on 1 worker.
