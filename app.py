@@ -2,6 +2,8 @@ from dotenv import load_dotenv
 load_dotenv()
 import os
 import secrets
+import threading
+import time
 from functools import wraps
 from datetime import datetime, timezone
 from flask import Flask, request, jsonify, session, redirect, render_template, abort
@@ -23,12 +25,13 @@ EXCLUDED_SYMBOLS = {
     # perpetuals / leveraged derivatives
     "DRV", "PERP","DRIFT","HYPE",
     # yield/staking-as-interest edge cases
-    "ARB","DRB", "CTX","VELO", "KAIO",
+    "ARB","DRB", "CTX","VELO", "KAIO","WLD",
     # legacy blacklist from before
     "PIRATE", "THQ",
 }
 
 HALAL_CACHE_PATH = "halal_cache.json"
+FAILED_REASON = "Classification unavailable right now."
 
 def load_halal_cache():
     try:
@@ -41,7 +44,11 @@ def save_halal_cache(cache):
     with open(HALAL_CACHE_PATH, "w") as f:
         json.dump(cache, f, indent=2)
 
-HALAL_CACHE = load_halal_cache()
+# Drop any failed lookups that were saved earlier so those coins get retried
+HALAL_CACHE = {
+    k: v for k, v in load_halal_cache().items()
+    if v.get("reason") != FAILED_REASON
+}
 
 from google import genai
 from google.genai import types
@@ -320,15 +327,50 @@ Respond ONLY with valid JSON in exactly this format:
 
     except Exception as e:
         print(f"Halal classification failed for {symbol}: {e}")
-        result = {
-            "status": "unclear",
-            "reason": "Classification unavailable right now."
-        }
+        return {"status": "unclear", "reason": FAILED_REASON}  # failed: don't cache it
 
-    if result.get("reason") != "Classification unavailable right now.":
-        HALAL_CACHE[symbol] = result
-        save_halal_cache(HALAL_CACHE)
+    HALAL_CACHE[symbol] = result
+    save_halal_cache(HALAL_CACHE)
     return result
+
+
+# ─────────────────────────────────────────────────────────────
+# Background halal classification (stays under Gemini's free 15 requests/min)
+# ─────────────────────────────────────────────────────────────
+
+CLASSIFY_QUEUE = []
+_queue_lock = threading.Lock()
+
+def queue_classification(symbol, name):
+    """Add a coin to the classification queue (no-op if cached or already queued)."""
+    with _queue_lock:
+        if symbol not in HALAL_CACHE and not any(s == symbol for s, _ in CLASSIFY_QUEUE):
+            CLASSIFY_QUEUE.append((symbol, name))
+
+def classify_worker():
+    """Classifies queued coins one at a time (~8-12/min) and retries failures."""
+    while True:
+        item = None
+        with _queue_lock:
+            if CLASSIFY_QUEUE:
+                item = CLASSIFY_QUEUE.pop(0)
+        if item is None:
+            time.sleep(2)
+            continue
+
+        symbol, name = item
+        if symbol in HALAL_CACHE:
+            continue
+
+        classify_halal(symbol, name)
+
+        if symbol not in HALAL_CACHE:
+            queue_classification(symbol, name)  # failed (503/429): retry later
+            time.sleep(30)
+        else:
+            time.sleep(5)
+
+threading.Thread(target=classify_worker, daemon=True).start()
 
 
 def safe_float(val):
@@ -508,8 +550,12 @@ def gainers():
         for p in top_20:
             symbol = p["base_currency_id"]
             name = p["base_name"]
-            halal = classify_halal(symbol, name)  
 
+            # Never call Gemini inside the request: use the cache, or queue it for the worker
+            halal = HALAL_CACHE.get(symbol)
+            if halal is None:
+                queue_classification(symbol, name)
+                halal = {"status": "unclear", "reason": "Classifying... refresh in a minute."}
 
             cleaned.append({
                 "name": name,
@@ -567,7 +613,8 @@ def notify(title, body):
             timeout=REQUEST_TIMEOUT
         )
         if not r.ok:
-            print(f"ntfy rejected the message: {r.status_code} {r.text[:200]}")
+            print(f"ntfy rejected the message: {r.status_code} {r.text[:200]} "
+                  f"(token sent: {bool(os.environ.get('NTFY_TOKEN'))})")
         return r.ok
     except Exception as e:
         print(f"ntfy send failed: {e}")
@@ -601,6 +648,9 @@ def cron_check():
     for p in top:
         symbol = p["base_currency_id"]
         pct = float(p["price_percentage_change_24h"])
+
+        # keep the halal cache warm even when the scanner page isn't open
+        queue_classification(symbol, p["base_name"])
 
         passed = [t for t in ALERT_THRESHOLDS if pct >= t]
         if not passed:
