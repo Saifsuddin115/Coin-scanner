@@ -25,9 +25,9 @@ EXCLUDED_SYMBOLS = {
     # perpetuals / leveraged derivatives
     "DRV", "PERP","DRIFT","HYPE",
     # yield/staking-as-interest edge cases
-    "ARB","DRB", "CTX","VELO", "KAIO","WLD","QI","ATH","RAY","YFI","SYRUP","UP",
+    "ARB","DRB", "CTX","VELO", "KAIO","WLD","QI","ATH","RAY","YFI","SYRUP","UP","LCX","DIMO","RLC",
     # legacy blacklist from before
-    "PIRATE", "THQ",
+    "PIRATE", "THQ","FLUID","ORCA",
 }
 
 HALAL_CACHE_PATH = "halal_cache.json"
@@ -512,7 +512,7 @@ def sparkline(symbol):
         return {"symbol": symbol, "closes": []}
 
 
-def fetch_top_gainers(limit=20):
+def fetch_top_gainers(limit=15):
     """Raw Coinbase top gainers (filtered + sorted). No halal/Gemini calls.
     Raises on network/parse errors — callers decide how to handle that."""
     response = requests.get(
@@ -544,10 +544,10 @@ def fetch_top_gainers(limit=20):
 @app.route("/api/gainers")
 def gainers():
     try:
-        top_20 = fetch_top_gainers(20)
+        top_15 = fetch_top_gainers(15)
         cleaned = []
 
-        for p in top_20:
+        for p in top_15:
             symbol = p["base_currency_id"]
             name = p["base_name"]
 
@@ -626,7 +626,7 @@ def cron_check():
     check_cron_key()
 
     try:
-        top = fetch_top_gainers(20)
+        top = fetch_top_gainers(15)
     except Exception as e:
         print(f"Alert check: gainers fetch failed: {e}")
         return jsonify({"error": "gainers fetch failed"}), 502
