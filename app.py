@@ -326,8 +326,8 @@ Respond ONLY with valid JSON in exactly this format:
             result["status"] = "unclear"
 
     except Exception as e:
-        print(f"Halal classification failed for {symbol}: {e}")
-        return {"status": "unclear", "reason": FAILED_REASON}  # failed: don't cache it
+        print(f"Halal classification failed for {symbol}: {type(e).__name__}: {e}")
+        return {"status": "unclear", "reason": f"Error: {type(e).__name__}"}
 
     HALAL_CACHE[symbol] = result
     save_halal_cache(HALAL_CACHE)
