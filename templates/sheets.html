@@ -1185,9 +1185,7 @@ dialog#deleteFolderModal p {
 
                 /* ========================= FOLDERS ========================= */
 
-        const FOLDERS_KEY = "tc_journal_folders";
-        const FOLDER_MAP_KEY = "tc_journal_trade_folder_map";
-        const MIGRATION_FLAG_KEY = "tc_journal_default_folder_done";
+       
 
         let folders = [];              // [{ id, name }]
         let tradeFolderMap = {};       // { tradeId: folderId }
@@ -1199,61 +1197,59 @@ dialog#deleteFolderModal p {
         const folderEmptyState = document.getElementById("folderEmptyState");
         const folderViewTitle = document.getElementById("folderViewTitle");
 
-        function loadFolders() {
-            try {
-                folders = JSON.parse(localStorage.getItem(FOLDERS_KEY)) || [];
-            } catch (error) {
-                folders = [];
-            }
-            try {
-                tradeFolderMap = JSON.parse(localStorage.getItem(FOLDER_MAP_KEY)) || {};
-            } catch (error) {
-                tradeFolderMap = {};
-            }
-        }
+        function rebuildFolderMap() {
+    tradeFolderMap = {};
+    trades.forEach(t => { if (t.folderId) tradeFolderMap[t.id] = t.folderId; });
+}
 
-        function saveFolders() {
-            try {
-                localStorage.setItem(FOLDERS_KEY, JSON.stringify(folders));
-            } catch (error) {
-                console.error("Failed to save folders:", error);
-            }
-        }
+async function loadFolders() {
+    try {
+        const res = await fetch("/api/folders");
+        folders = res.ok ? await res.json() : [];
+    } catch (error) {
+        folders = [];
+    }
+}
 
-        function saveFolderMap() {
-            try {
-                localStorage.setItem(FOLDER_MAP_KEY, JSON.stringify(tradeFolderMap));
-            } catch (error) {
-                console.error("Failed to save folder assignments:", error);
-            }
-        }
+async function assignTradeToFolder(tradeId, folderId) {
+    const fid = folderId ? Number(folderId) : null;
+    if (fid) tradeFolderMap[tradeId] = fid;
+    else delete tradeFolderMap[tradeId];
+    const t = trades.find(x => x.id === tradeId);
+    if (t) t.folderId = fid;
+    await fetch(`/api/trades/${tradeId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ folder_id: fid })
+    });
+}
 
-        // One-time migration: if this is the first time folders exist and there are
-        // already trades on the books, group them all into a "100 Trades" folder
-        // instead of leaving them invisible/uncategorized.
-        function migrateDefaultFolder() {
-            if (localStorage.getItem(MIGRATION_FLAG_KEY)) return;
-            if (folders.length === 0 && trades.length > 0) {
-                const defaultFolder = { id: createId(), name: "100 Trades" };
-                folders.push(defaultFolder);
-                trades.forEach(t => { tradeFolderMap[t.id] = defaultFolder.id; });
-                saveFolders();
-                saveFolderMap();
-            }
-            localStorage.setItem(MIGRATION_FLAG_KEY, "1");
-        }
+async function createFolder(name) {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    const res = await fetch("/api/folders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trimmed })
+    });
+    if (!res.ok) { alert("Failed to create folder."); return; }
+    folders.push(await res.json());
+    renderFolderListView();
+}
 
-        function assignTradeToFolder(tradeId, folderId) {
-            if (folderId) {
-                tradeFolderMap[tradeId] = folderId;
-            } else {
-                delete tradeFolderMap[tradeId];
-            }
-            saveFolderMap();
-        }
+async function deleteFolder(folderId) {
+    await fetch(`/api/folders/${folderId}`, { method: "DELETE" });
+    folders = folders.filter(f => f.id !== folderId);
+    Object.keys(tradeFolderMap).forEach(tradeId => {
+        if (tradeFolderMap[tradeId] === folderId) delete tradeFolderMap[tradeId];
+    });
+    trades.forEach(t => { if (t.folderId === folderId) t.folderId = null; });
+    renderFolderListView();
+}
 
+       
         function folderTradeCount(folderId) {
-             return trades.filter(t => tradeFolderMap[t.id] === folderId).length;
+            return trades.filter(t => tradeFolderMap[t.id] === folderId).length;
         }
 
         function uncategorizedCount() {
@@ -1263,26 +1259,7 @@ dialog#deleteFolderModal p {
             }).length;
         }
 
-        function createFolder(name) {
-            const trimmed = name.trim();
-            if (!trimmed) return;
-            folders.push({ id: createId(), name: trimmed });
-            saveFolders();
-            renderFolderListView();
-        }
-
-        function deleteFolder(folderId) {
-            folders = folders.filter(f => f.id !== folderId);
-            saveFolders();
-            Object.keys(tradeFolderMap).forEach(tradeId => {
-                if (tradeFolderMap[tradeId] === folderId) delete tradeFolderMap[tradeId];
-            });
-            saveFolderMap();
-            renderFolderListView();
-        }
-
-        function populateFolderSelect(selectEl, selectedId) {
-            selectEl.innerHTML = `<option value="">No Folder</option>` +
+        function populateFolderSelect(selectEl, selectedId) {            selectEl.innerHTML = `<option value="">No Folder</option>` +
                 folders.map(f => `<option value="${f.id}">${escapeHTML(f.name)}</option>`).join("");
             selectEl.value = selectedId && folders.some(f => f.id === selectedId) ? selectedId : "";
         }
@@ -1347,8 +1324,8 @@ dialog#deleteFolderModal p {
                 actionCell.appendChild(delBtn);
             }
 
-            row.addEventListener("dblclick", () => openFolder(folderId, name));
-            return row;
+            row.addEventListener("click", () => openFolder(folderId, name));
+                        return row;
         }
 
         const folderModal = document.getElementById("folderModal");
@@ -1421,9 +1398,9 @@ dialog#deleteFolderModal p {
             moveToFolderModal.showModal();
         }
 
-        document.getElementById("confirmMoveToFolder").addEventListener("click", () => {
-            if (selectedMoveFolderValue === undefined) return;
-            assignTradeToFolder(pendingMoveTradeId, selectedMoveFolderValue);
+        document.getElementById("confirmMoveToFolder").addEventListener("click", async () => {
+                if (selectedMoveFolderValue === undefined) return;
+            await assignTradeToFolder(pendingMoveTradeId, selectedMoveFolderValue);
             moveToFolderModal.close();
             renderTrades();
         });
@@ -1451,6 +1428,7 @@ dialog#deleteFolderModal p {
         console.error("Failed to load journal trades:", error);
         trades = [];
     }
+        rebuildFolderMap();
 }
 
         function saveTrades() {
@@ -1504,7 +1482,8 @@ function fromApiTrade(t) {
         thesis: t.thesis || "",
         whatHappened: t.what_happened || "",
         better: t.better || "",
-        lesson: t.lesson || ""
+        lesson: t.lesson || "",
+        folderId: t.folder_id ?? null
     };
 }
 
@@ -1800,14 +1779,7 @@ populateFolderSelect(tradeFolder, currentOpenFolderId && currentOpenFolderId !==
             renderTrades();
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
-        function pruneStaleFolderMap() {
-    const validIds = new Set(trades.map(t => t.id));
-    let changed = false;
-    Object.keys(tradeFolderMap).forEach(id => {
-        if (!validIds.has(id)) { delete tradeFolderMap[id]; changed = true; }
-    });
-    if (changed) saveFolderMap();
-}
+    
 
         let selectedConfluenceFilters = new Set();
 const trigger = document.getElementById("confluenceFilterTrigger");
@@ -1874,8 +1846,7 @@ document.addEventListener("click", e => {
     if (!res.ok) { alert("Failed to save trade."); return; }
 
     const savedTradeId = editingTradeId || (await res.json().catch(() => null))?.id;
-    if (savedTradeId) assignTradeToFolder(savedTradeId, tradeFolder.value || null);
-
+    if (savedTradeId) await assignTradeToFolder(savedTradeId, tradeFolder.value || null);
     await loadTrades();
     showTradeList();
 });
@@ -1898,7 +1869,6 @@ document.addEventListener("click", e => {
             if (!editingTradeId) return;
 
             await fetch(`/api/trades/${editingTradeId}`, { method: "DELETE" });
-            assignTradeToFolder(editingTradeId, null);
             editingTradeId = null;
             await loadTrades();
             showTradeList();
@@ -1918,11 +1888,9 @@ document.addEventListener("click", e => {
 
         /* ========================= INIT ========================= */
 
-        (async function init() {
-    loadFolders();
+(async function init() {
+    await loadFolders();
     await loadTrades();
-    pruneStaleFolderMap();
-    migrateDefaultFolder();
     renderFolderListView();
 })();
 

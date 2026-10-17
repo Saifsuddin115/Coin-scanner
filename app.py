@@ -8,7 +8,8 @@ from functools import wraps
 from datetime import datetime, timezone
 from flask import Flask, request, jsonify, session, redirect, render_template, abort
 import requests
-from models import db, Trade, MonthlySummary
+from models import db, Trade, MonthlySummary, Folder
+from sqlalchemy import text
 import json
 
 
@@ -25,7 +26,6 @@ EXCLUDED_SYMBOLS = {
     # perpetuals / leveraged derivatives
     "DRV", "PERP","DRIFT","HYPE",
     # yield/staking-as-interest edge cases
-    "ARB","DRB", "CTX","VELO", "KAIO","WLD","QI","ATH","RAY","YFI","SYRUP","UP","LCX","DIMO","RLC","CAP",
     # legacy blacklist from before
     "PIRATE", "THQ","FLUID","ORCA",
 }
@@ -391,6 +391,9 @@ db.init_app(app)
 
 with app.app_context():
     db.create_all()
+    # create_all() won't add a column to an existing table, so do it manually (safe to re-run)
+    db.session.execute(text("ALTER TABLE trade ADD COLUMN IF NOT EXISTS folder_id INTEGER"))
+    db.session.commit()
 
 def require_login(f):
     @wraps(f)
@@ -405,7 +408,7 @@ def require_login(f):
 ALLOWED_TRADE_FIELDS = {
     "session", "coin", "direction", "setup", "sl", "tp", "rr", "pnl",
     "rules_followed", "reason", "confluences", "thesis",
-    "what_happened", "better", "lesson", "entry_type", "notes"
+    "what_happened", "better", "lesson", "entry_type", "notes","folder_id"
 }
 
 @app.post("/login")
@@ -438,7 +441,6 @@ def create_trade():
     db.session.add(trade)
     db.session.commit()
     return jsonify(trade.to_dict()), 201
-
 @app.put("/api/trades/<int:id>")
 @require_login
 def update_trade(id):
@@ -455,6 +457,30 @@ def update_trade(id):
 @require_login
 def delete_trade(id):
     Trade.query.filter_by(id=id).delete()
+    db.session.commit()
+    return "", 204
+
+@app.get("/api/folders")
+@require_login
+def list_folders():
+    return jsonify([f.to_dict() for f in Folder.query.order_by(Folder.id).all()])
+
+@app.post("/api/folders")
+@require_login
+def create_folder():
+    name = (request.json.get("name") or "").strip()[:40]
+    if not name:
+        return jsonify({"error": "name required"}), 400
+    folder = Folder(name=name)
+    db.session.add(folder)
+    db.session.commit()
+    return jsonify(folder.to_dict()), 201
+
+@app.delete("/api/folders/<int:id>")
+@require_login
+def delete_folder(id):
+    Trade.query.filter_by(folder_id=id).update({"folder_id": None})
+    Folder.query.filter_by(id=id).delete()
     db.session.commit()
     return "", 204
 

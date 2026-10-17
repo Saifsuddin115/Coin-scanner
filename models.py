@@ -1,6 +1,13 @@
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
+class Folder(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(40), nullable=False)
+
+    def to_dict(self):
+        return {"id": self.id, "name": self.name}
+    
 class Trade(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False, index=True)
@@ -12,6 +19,7 @@ class Trade(db.Model):
     tp = db.Column(db.Float, nullable=True)
     rr = db.Column(db.Float, nullable=True)
     pnl = db.Column(db.Float, nullable=True)
+    folder_id = db.Column(db.Integer, nullable=True)
     rules_followed = db.Column(db.Boolean, nullable=True)
     reason = db.Column(db.Text, default="")
     confluences = db.Column(db.JSON, default=list)   # ["confDailyOB", "confBOS", ...]

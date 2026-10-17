@@ -1,84 +1,4 @@
 {
-  "QI": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "POND": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "FARM": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "DRB": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "EDGE": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "MPLX": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "VARA": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "PNG": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "AERO": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "SEI": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "ENA": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "GRASS": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "VELO": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "CTX": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "RARE": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "SUI": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "JTO": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "WLD": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "BNKR": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
-  "B3": {
-    "status": "unclear",
-    "reason": "Classification unavailable right now."
-  },
   "SPK": {
     "status": "unclear",
     "reason": "SPK is a modular infrastructure token with varying implementations, and its compliance depends on whether specific projects built on it involve interest-based lending or prohibited speculative activities."
@@ -142,5 +62,37 @@
   "SHPING": {
     "status": "halal",
     "reason": "Shping acts as a loyalty and rewards utility token for a retail data platform, and its reward mechanisms are based on marketing and consumer participation rather than interest-bearing financial services."
+  },
+  "BLAST": {
+    "status": "halal",
+    "reason": "Blast is a Layer 2 Ethereum scaling solution that provides infrastructure utility, and while it features native yield, the returns are derived from ETH staking and real-world asset (RWA) protocols rather than debt-based interest."
+  },
+  "INDEX": {
+    "status": "unclear",
+    "reason": "While the INDEX token is used for governance, the Index Cooperative protocol creates and manages diversified crypto-asset indices, many of which inherently include interest-bearing tokens and leveraged/inverse financial instruments, making the core business model's Shariah compliance ambiguous."
+  },
+  "NEON": {
+    "status": "halal",
+    "reason": "Neon EVM functions as a high-performance infrastructure layer for executing Ethereum smart contracts on Solana, with staking rewards derived from network validation and transaction processing rather than interest-based lending."
+  },
+  "GTC": {
+    "status": "halal",
+    "reason": "Gitcoin (GTC) serves as a governance token for a decentralized platform facilitating public goods funding and grants, with no intrinsic interest-bearing or prohibited financial mechanisms."
+  },
+  "AVT": {
+    "status": "halal",
+    "reason": "Aventus (AVT) is a blockchain protocol focused on enterprise-grade supply chain and event ticketing utility, and its native utility features do not rely on interest-based lending or prohibited financial activities."
+  },
+  "ALT": {
+    "status": "halal",
+    "reason": "AltLayer is a decentralized protocol for restaked rollups that provides infrastructure and security services; its rewards are derived from network utility and validator services rather than interest-based lending."
+  },
+  "RSC": {
+    "status": "halal",
+    "reason": "ResearchCoin is a utility token used to incentivize and reward scientific research contributions, functioning as a platform for collaboration and peer review rather than a financial interest-bearing instrument."
+  },
+  "SAND": {
+    "status": "halal",
+    "reason": "SAND is a utility token for the Sandbox metaverse platform, and its staking mechanism functions as a reward for network participation and governance rather than interest on debt."
   }
 }
