@@ -1622,7 +1622,7 @@ function renderPagination(totalPages) {
                     const dateA = new Date(a.date || 0).getTime();
                     const dateB = new Date(b.date || 0).getTime();
                     if (dateB !== dateA) return dateB - dateA;
-                    return (b.updatedAt || 0) - (a.updatedAt || 0);
+                    return Number(b.id) - Number(a.id);
                 });
 
                 const PAGE_SIZE = 15;

@@ -171,7 +171,7 @@ h1 {
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--gold);
-    font-family: 'Inter', sans-serif;
+    font-family: 'Montserrat', serif;
     margin-bottom: 4px;
 }
 
@@ -179,7 +179,7 @@ h1 {
     display: block;
     font-size: 24px;
     font-weight: 700;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Montserrat', serif;
     
 }
 
@@ -235,7 +235,7 @@ h1 {
 
 .day.profit {
     border-color: #2c77da9a;
-    background: #0b3a77cc;
+    background: #0b3a77;
 }
 
 .day.loss {
@@ -253,11 +253,11 @@ h1 {
 .day-pnl {
     font-size: 14px;
     font-weight: 700;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Montserrat', serif;
     margin-top: 8px;
 }
 
-.pnl-positive { color: #2b68c4; }
+.pnl-positive { color: #5784c9; }
 .pnl-negative { color: #5a5a5a; }
 
 .day-trades {
@@ -943,7 +943,7 @@ function loadDay(day) {
             confluences: t.confluences || []
         })),
         pnl: scored.length ? parseFloat(((multiplier - 1) * 100).toFixed(2)) : null,
-        notes: dayTrades[0]?.notes || ""
+        notes: (dayTrades.find(t => t.notes) || {}).notes || ""
     };
 }
 async function saveDayToApi(day, data) {
@@ -1055,7 +1055,7 @@ function applyDayData(box, day) {
 
 
 // ── Trade rows ────────────────────────────────────────────
-const MAX_TRADES = 3;
+const MAX_TRADES = 5;
 
 function updateAddButton() {
     const btn   = document.getElementById('addTradeRow');
@@ -1211,7 +1211,10 @@ function migrateAllDays() {
 async function computeStreaksFromApi() {
     const res = await fetch("/api/trades");
     const allTrades = await res.json();
-    allTrades.sort((a, b) => new Date(a.date) - new Date(b.date));
+    allTrades.sort((a, b) => {
+    const diff = new Date(a.date) - new Date(b.date);
+    return diff !== 0 ? diff : a.id - b.id;
+});
 
     let winStreak = 0, ruleStreak = 0;
     let winBest = parseInt(localStorage.getItem('winStreakBest') || '0', 10);
@@ -1340,6 +1343,17 @@ document.getElementById("saveDay").addEventListener("click", async () => {
     });
 
     const notes = document.getElementById("inputNotes").value;
+
+    // Keep notes alive when no row has a valid P&L: reuse the first existing row
+if (!trades.length && notes.trim()) {
+    const firstRow = rows[0];
+    trades.push({
+        id: firstRow?.dataset.tradeId ? Number(firstRow.dataset.tradeId) : undefined,
+        pnl: null,
+        followedRules: null,
+        confluences: []
+    });
+}
 
     await saveDayToApi(activeDay, { trades, notes });
     renderCalendar();

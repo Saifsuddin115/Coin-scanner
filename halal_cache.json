@@ -94,5 +94,61 @@
   "SAND": {
     "status": "halal",
     "reason": "SAND is a utility token for the Sandbox metaverse platform, and its staking mechanism functions as a reward for network participation and governance rather than interest on debt."
+  },
+  "IRYS": {
+    "status": "halal",
+    "reason": "Irys is a decentralized storage layer providing permanent data infrastructure, and its staking/reward mechanisms are tied to network maintenance and service validation rather than interest-bearing lending."
+  },
+  "UP": {
+    "status": "halal",
+    "reason": "Superform is an infrastructure protocol designed for permissionless yield distribution and cross-chain asset management, where staking and reward mechanisms are based on protocol utility and yield-generating strategies rather than debt-based interest."
+  },
+  "NCT": {
+    "status": "halal",
+    "reason": "PolySwarm is a decentralized threat intelligence marketplace where NCT is used as a utility token for incentivizing security experts to detect malware, which constitutes a service-based ecosystem rather than a financial interest-based one."
+  },
+  "ERA": {
+    "status": "halal",
+    "reason": "Caldera is a Rollup-as-a-Service infrastructure platform providing technological utility, and its token utility is based on governance and ecosystem participation rather than prohibited financial mechanisms."
+  },
+  "BLEND": {
+    "status": "halal",
+    "reason": "Fluent (BLEND) is a decentralized identity and bridge protocol providing infrastructure utility for cross-chain interoperability, and its rewards are generated from service fees rather than interest-based lending."
+  },
+  "RECALL": {
+    "status": "unclear",
+    "reason": "Recall Network is a nascent project with limited public technical documentation regarding its core consensus mechanisms and reward structures to confirm compliance with Shariah economic principles."
+  },
+  "TRUST": {
+    "status": "halal",
+    "reason": "Intuition is a decentralized knowledge graph protocol providing utility for reputation and data verification, with no intrinsic interest-based, gambling, or prohibited financial mechanisms."
+  },
+  "LA": {
+    "status": "halal",
+    "reason": "Lagrange is a cross-chain infrastructure protocol providing verifiable computation services, and its token utility is tied to network security and service access rather than interest-bearing or prohibited activities."
+  },
+  "WET": {
+    "status": "unclear",
+    "reason": "Humidifi (WET) lacks sufficient transparent documentation regarding its protocol utility and the specific economic sources of its yield mechanisms."
+  },
+  "TREE": {
+    "status": "halal",
+    "reason": "Treehouse provides an analytics and data aggregation platform for DeFi, and its token utility is centered on platform access and governance rather than interest-based lending or prohibited financial activities."
+  },
+  "PROS": {
+    "status": "halal",
+    "reason": "Pharos is a cross-chain prediction and oracle-based protocol focused on data integrity and decentralization, which does not rely on interest-based lending or prohibited business activities."
+  },
+  "POWR": {
+    "status": "halal",
+    "reason": "Powerledger provides utility for energy trading and grid management, and its staking mechanism is based on network participation rather than interest-bearing lending."
+  },
+  "ZKC": {
+    "status": "unclear",
+    "reason": "Boundless (ZKC) lacks transparent, verifiable documentation regarding its core utility and underlying economic mechanisms, making a definitive Shariah assessment impossible."
+  },
+  "BREV": {
+    "status": "halal",
+    "reason": "Brevis provides zero-knowledge infrastructure for data computation and verification, with rewards derived from providing verifiable computation services rather than interest-based lending."
   }
 }

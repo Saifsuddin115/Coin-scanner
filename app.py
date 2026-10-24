@@ -429,7 +429,7 @@ def list_trades():
         y, m = int(request.args["year"]), int(request.args["month"])
         q = q.filter(db.extract('year', Trade.date) == y,
                      db.extract('month', Trade.date) == m)
-    trades = q.order_by(Trade.date.desc()).all()
+    trades = q.order_by(Trade.date.asc(), Trade.id.asc()).all()
     return jsonify([t.to_dict() for t in trades])
 
 @app.post("/api/trades")
